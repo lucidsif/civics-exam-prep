@@ -1,0 +1,4 @@
+.DS_Store
+.wrangler/
+public/
+.deploy.env

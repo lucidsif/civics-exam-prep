@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grading tests</title>
+<style>
+  body { font: 16px/1.5 system-ui, sans-serif; margin: 2rem; color: #1a2233; }
+  h1 { font-size: 1.4rem; }
+  #summary { font-weight: 700; padding: 0.6rem 0.9rem; border-radius: 8px; margin: 1rem 0; }
+  .ok { background: #e6f4ea; color: #1e6b3a; }
+  .bad { background: #fdecec; color: #a01919; }
+  ul { list-style: none; padding: 0; }
+  li { padding: 0.2rem 0; font-family: ui-monospace, monospace; font-size: 0.9rem; }
+  li.pass::before { content: "PASS "; color: #1e6b3a; font-weight: 700; }
+  li.fail::before { content: "FAIL "; color: #a01919; font-weight: 700; }
+  iframe { display: none; }
+</style>
+</head>
+<body>
+<h1>Quiz grading tests</h1>
+<p>Loads the real <code>index.html</code> and checks its grading functions. Serve the folder
+(<code>python3 -m http.server 8901</code>) and open <code>/tests.html</code>.</p>
+<p id="summary">Running…</p>
+<ul id="results"></ul>
+<iframe id="app"></iframe>
+
+<script>
+// [questionId, input, expectedCorrect, expectedCount]
+const CASES = [
+  // need:2 — Q9
+  [9, "life", false, 1],
+  [9, "life, liberty", true, 2],
+  [9, "life and liberty", true, 2],
+  [9, "liberty and pursuit of happiness", true, 2],
+  [9, "life, life", false, 1],            // dedupe: same answer twice is not two
+  // need:2 — Q100 (comma inside a holiday name; Juneteenth newly added)
+  [100, "Christmas", false, 1],
+  [100, "Christmas and Thanksgiving", true, 2],
+  [100, "Juneteenth, Christmas", true, 2],
+  [100, "Martin Luther King, Jr. Day", false, 1], // comma inside one answer, still 1
+  // need:2 — Q36 ("and" inside an answer)
+  [36, "Secretary of Health and Human Services", false, 1],
+  [36, "Secretary of Defense and Secretary of State", true, 2],
+  // need:2 — Q51 / Q55
+  [51, "freedom of speech", false, 1],
+  [51, "freedom of speech, freedom of religion", true, 2],
+  [55, "vote", false, 1],
+  [55, "vote and run for office", true, 2],
+  [55, "call Senators and Representatives", false, 1], // single answer containing "and"
+  // need:3 — Q64
+  [64, "New York, New Jersey", false, 2],
+  [64, "New York, New Jersey, Virginia", true, 3],
+  // typo tolerance inside multi-answer input
+  [9, "life, liberti", true, 2],                  // "liberti" -> liberty
+  [64, "New York, New Jersy, Virgina", true, 3],  // two misspelled states
+  [100, "Christmas and Thanskgiving", true, 2],   // "Thanskgiving" -> Thanksgiving
+  [64, "New Yrok, New Yrok", false, 1],            // typo dedupe: same misspelled state twice = 1
+  // G1 fix: a correctly-spelled answer can't be spent as a typo of a near-identical one
+  [64, "south carolina, south carolina, georgia", false, 2], // was falsely 3 (claimed north)
+  [64, "north carolina, north carolina, georgia", false, 2], // symmetric case
+  // ESL: no commas / no punctuation between answers
+  [9, "life liberty", true, 2],
+  [64, "new york new jersey virginia", true, 3],
+  [100, "christmas thanksgiving", true, 2],
+  [36, "secretary of defense secretary of state", true, 2], // no comma, no "and"
+  // ESL: no punctuation AND typos together
+  [9, "life liberti", true, 2],
+  [64, "new york new jersy virgina", true, 3],
+  // single-answer typo tolerance (a slip or two in a phrase still passes)
+  [1, "the consitution", true, 1],                 // dropped a "t"
+  [5, "the bill of rihgts", true, 1],              // transposed letters
+  [64, "north carolina, south carolina, georgia", true, 3], // near-identical answers stay distinct
+  // need:1 regressions — unchanged behavior
+  [1, "the Constitution", true, 1],
+  [2, "protects basic rights of Americans", true, 1], // any ONE of the three suffices
+  [2, "sets up the government", true, 1],
+  [7, "27", true, 1],                     // number variant
+  // G2 fix: Q17 modeled as two parts (need:2), so both must be given
+  [17, "the Senate and House", true, 2],      // both parts named
+  [17, "the Senate and the House", true, 2],  // extra articles ignored
+  [17, "Senate House", true, 2],              // no punctuation (ESL)
+  [17, "Senate", false, 1],                   // only one part = incomplete
+  [9, "the answer is life and liberty", true, 2], // extra words ignored
+  [3, "we the people", true, 1],          // typo/case handled
+  // apostrophe tolerance: an ESL learner types no apostrophe, so a possessive/
+  // contraction answer must still match when the apostrophe is dropped.
+  [100, "new years day and christmas", true, 2],   // "New Year's Day" without the apostrophe
+  [100, "christmas and new years day", true, 2],
+  [42, "give a drivers license", true, 1],         // "driver's license"
+  [77, "fought for womens rights", true, 1],       // "women's rights"
+  [48, "you dont have to pay a poll tax to vote", true, 1], // "don't"
+  [100, "new year's day and christmas", true, 2],  // apostrophe form still works too
+  // Q95: the USCIS alternate answers the card used to reject are now accepted.
+  [95, "New Jersey", true, 1],
+  [95, "on the Hudson River", true, 1],
+  [95, "near New York City", true, 1],
+  [95, "Liberty Island", true, 1]                  // primary answer still fine
+];
+
+// [questionId, input, expectedMatchedIndices] — which accepted answers are marked
+// on a partial result (used to highlight "you gave this" in the list).
+const INDEX_CASES = [
+  [9, "liberty", [1]],                        // only the 2nd answer
+  [9, "life life", [0]],                       // dedupe -> just index 0
+  [64, "new york and virginia", [4, 9]],       // New York (4), Virginia (9)
+  [9, "the president", []]                      // nothing matched
+];
+
+// [statRecord, expectedMasteryKey] — M2 mastery level from a stats[id] record.
+const MASTERY_CASES = [
+  [undefined,              "new"],      // untried
+  [{ c: 0, w: 1, streak: 0 }, "learning"],  // missed once
+  [{ c: 1, w: 0, streak: 1 }, "learning"],  // right once, not yet twice
+  [{ c: 2, w: 0, streak: 2 }, "mastered"],  // right twice running
+  [{ c: 5, w: 1, streak: 0 }, "learning"]   // mastered then missed → back to learning
+];
+
+// N1-A study streak — [prev, today, yesterday, wantCount, wantDayUp, wantBest]
+const STREAK_CASES = [
+  [{ last: "", count: 0, best: 0 },            "2026-7-15", "2026-7-14", 1, true, 1],   // first ever
+  [{ last: "2026-7-14", count: 3, best: 5 },   "2026-7-15", "2026-7-14", 4, true, 5],   // continue
+  [{ last: "2026-7-15", count: 4, best: 5 },   "2026-7-15", "2026-7-14", 4, false, 5],  // same day = no-op
+  [{ last: "2026-7-10", count: 9, best: 9 },   "2026-7-15", "2026-7-14", 1, true, 9],   // gap resets, best kept
+  [{ last: "2026-7-14", count: 5, best: 4 },   "2026-7-15", "2026-7-14", 6, true, 6]    // best rises with count
+];
+// N1-A daily goal — [prev, today, target, wantCount, wantJustHit]
+const DAILY_CASES = [
+  [{ date: "", count: 0 },          "2026-7-15", 10, 1, false],   // new day, first action
+  [{ date: "2026-7-15", count: 9 }, "2026-7-15", 10, 10, true],   // crossing the goal
+  [{ date: "2026-7-15", count: 10 },"2026-7-15", 10, 11, false],  // past the goal — no re-hit (latched)
+  [{ date: "2026-7-14", count: 10 },"2026-7-15", 10, 1, false]    // new day resets the count
+];
+// N1-C tier — [mastered, total, wantKey]
+const TIER_CASES = [
+  [0, 91, "begin"], [5, 91, "started"], [25, 91, "feet"],
+  [46, 91, "half"], [70, 91, "almost"], [91, 91, "ready"]
+];
+// Mock interview VAD — [state, now, wantReason] (thresholds: silence 2500ms,
+// initial-silence 10000ms, max 22000ms). state = {speechStarted, startAt, lastVoice}.
+const VAD_CASES = [
+  [{ speechStarted: true,  startAt: 0, lastVoice: 0 },     2600,  "silence"],   // 2600 > 2500 quiet after speech
+  [{ speechStarted: true,  startAt: 0, lastVoice: 1000 },  3000,  null],        // still within the pause window (2000 < 2500)
+  [{ speechStarted: false, startAt: 0, lastVoice: 0 },    10100,  "no-speech"], // never started, past 10s
+  [{ speechStarted: false, startAt: 0, lastVoice: 0 },     5000,  null],        // still waiting for her to begin
+  [{ speechStarted: true,  startAt: 0, lastVoice: 21900 }, 22100, "max"]        // hard cap wins
+];
+// WAV encode — [pcmLength, inRate, outRate, wantBlobSize] (16-bit mono => 44 + samples*2).
+const WAV_CASES = [
+  [10, 16000, 16000, 64],   // no resample: 44 + 10*2
+  [10, 32000, 16000, 54]    // 2:1 downsample => 5 samples: 44 + 5*2
+];
+
+// Officeholder-answer snapshot — locks in the exact accepted answers for every
+// dynamic:true (time-sensitive) question as of the last verification pass
+// (see SOURCES.md). This is the guard against a future edit silently drifting
+// from what was actually checked against a primary source: if this list and
+// the live data disagree, something changed the answer without re-verifying it.
+// Last verified: July 16, 2026, directly against uscis.gov, supremecourt.gov,
+// speaker.gov, senate.gov, gov.texas.gov, mccaul.house.gov, casar.house.gov.
+const DYNAMIC_SNAPSHOT = [
+  [20, ["John Cornyn", "Ted Cruz"]],
+  [23, ["Greg Casar"]],
+  [28, ["Donald J. Trump", "Donald Trump", "Trump"]],
+  [29, ["JD Vance", "Vance"]],
+  [39, ["nine (9)"]],
+  [40, ["John Roberts", "John G. Roberts, Jr."]],
+  [43, ["Greg Abbott"]],
+  [46, ["Republican (Party)"]],
+  [47, ["Mike Johnson", "Johnson", "James Michael Johnson"]]
+];
+
+function run(win) {
+  const results = document.getElementById("results");
+  // ALL_QUESTIONS is a top-level `const`, so it's in the iframe's global lexical
+  // scope but NOT a property of its window. Read it via the iframe's own eval.
+  const all = win.eval("ALL_QUESTIONS");
+  const byId = id => all.find(q => q.id === id);
+  let fails = 0;
+  const row = (pass, text) => {
+    if (!pass) fails++;
+    const li = document.createElement("li");
+    li.className = pass ? "pass" : "fail";
+    li.textContent = text;
+    results.appendChild(li);
+  };
+  for (const [id, input, wantCorrect, wantCount] of CASES) {
+    const q = byId(id);
+    const correct = win.isCorrectAnswer(input, q);
+    const count = win.matchCount(input, q);
+    const pass = correct === wantCorrect && count === wantCount;
+    row(pass, `q${id} "${input}" → correct=${correct} count=${count}` +
+      (pass ? "" : ` (want correct=${wantCorrect} count=${wantCount})`));
+  }
+  for (const [id, input, wantIdx] of INDEX_CASES) {
+    const got = [...win.matchedIndices(input, byId(id))].sort((a, b) => a - b);
+    const want = [...wantIdx].sort((a, b) => a - b);
+    const pass = JSON.stringify(got) === JSON.stringify(want);
+    row(pass, `q${id} "${input}" → matched indices [${got}]` + (pass ? "" : ` (want [${want}])`));
+  }
+  for (const [stat, wantKey] of MASTERY_CASES) {
+    const got = win.masteryFromStat(stat).key;
+    const pass = got === wantKey;
+    row(pass, `mastery ${JSON.stringify(stat)} → ${got}` + (pass ? "" : ` (want ${wantKey})`));
+  }
+  for (const [prev, today, yest, wc, wUp, wb] of STREAK_CASES) {
+    const r = win.advanceStreak(prev, today, yest);
+    const pass = r.streak.count === wc && r.dayUp === wUp && r.streak.best === wb;
+    row(pass, `streak ${JSON.stringify(prev)} @${today} → count=${r.streak.count} up=${r.dayUp} best=${r.streak.best}` +
+      (pass ? "" : ` (want ${wc}/${wUp}/${wb})`));
+  }
+  for (const [prev, today, target, wc, wHit] of DAILY_CASES) {
+    const r = win.bumpDaily(prev, today, target);
+    const pass = r.daily.count === wc && r.justHit === wHit;
+    row(pass, `daily ${JSON.stringify(prev)} @${today} → count=${r.daily.count} justHit=${r.justHit}` +
+      (pass ? "" : ` (want ${wc}/${wHit})`));
+  }
+  for (const [mastered, total_, wantKey] of TIER_CASES) {
+    const got = win.tierFor(mastered, total_).key;
+    const pass = got === wantKey;
+    row(pass, `tier ${mastered}/${total_} → ${got}` + (pass ? "" : ` (want ${wantKey})`));
+  }
+  for (const [state, now, wantReason] of VAD_CASES) {
+    const got = win.vadShouldStop(state, now);
+    const pass = got === wantReason;
+    row(pass, `vad ${JSON.stringify(state)} @${now} → ${got}` + (pass ? "" : ` (want ${wantReason})`));
+  }
+  // downsample: box-average [0,1,0,1] 4→2Hz gives [0.5,0.5]; upsample request is a no-op.
+  {
+    const half = [...win.downsample(new Float32Array([0, 1, 0, 1]), 4, 2)];
+    row(JSON.stringify(half) === "[0.5,0.5]", `downsample 4→2 → [${half}]` +
+      (JSON.stringify(half) === "[0.5,0.5]" ? "" : " (want [0.5,0.5])"));
+    const same = win.downsample(new Float32Array([1, 2, 3]), 8000, 16000).length;
+    row(same === 3, `downsample no-op when out>=in → len ${same}` + (same === 3 ? "" : " (want 3)"));
+  }
+  for (const [len, inR, outR, wantSize] of WAV_CASES) {
+    const size = win.encodeWav(new Float32Array(len), inR, outR).size;
+    const pass = size === wantSize;
+    row(pass, `wav ${len}@${inR}→${outR} → ${size} bytes` + (pass ? "" : ` (want ${wantSize})`));
+  }
+  // Officeholder snapshot — the exact accepted answers must match the last
+  // verified-against-primary-sources values. A failure here means an answer
+  // was edited without a fresh verification pass (see SOURCES.md).
+  for (const [id, want] of DYNAMIC_SNAPSHOT) {
+    const got = byId(id).a;
+    const pass = JSON.stringify(got) === JSON.stringify(want);
+    row(pass, `dynamic q${id} answers → ${JSON.stringify(got)}` +
+      (pass ? "" : ` (want ${JSON.stringify(want)}, verified against a primary source — see SOURCES.md)`));
+  }
+  // Every dynamic (time-sensitive) question must document WHEN it may change —
+  // either a concrete date/year, or an explicit "no scheduled change" note —
+  // so nobody has to guess. Catches a dynamic question added/edited without a
+  // change-date note.
+  {
+    const dynamicQs = all.filter(q => q.dynamic);
+    for (const q of dynamicQs) {
+      const note = q.note || "";
+      const pass = /\b20\d{2}\b/.test(note) || /no (fixed|scheduled) change/i.test(note);
+      row(pass, `q${q.id} dynamic note documents a change-date or "no scheduled change"` +
+        (pass ? "" : ` (note: "${note}")`));
+    }
+    row(dynamicQs.length === 9, `dynamic question count → ${dynamicQs.length}` +
+      (dynamicQs.length === 9 ? "" : " (want 9 — a dynamic question was added/removed; update DYNAMIC_SNAPSHOT)"));
+  }
+  // English/Bengali answer-count parity across all 100 questions — every
+  // translated question's Bengali answer list must have exactly as many
+  // entries as its English one, or the multi-answer questions (need:2/3) will
+  // silently under-represent the accepted answers in the Bengali panel.
+  {
+    const translated = all.filter(q => q.abn && q.abn.length);
+    const mismatches = translated.filter(q => q.abn.length !== q.a.length);
+    const pass = mismatches.length === 0;
+    row(pass, `Bengali/English answer-count parity across ${translated.length} translated questions` +
+      (pass ? "" : ` (mismatched: ${mismatches.map(q => `q${q.id} en=${q.a.length}/bn=${q.abn.length}`).join(", ")})`));
+  }
+  const total = results.children.length;
+  const summary = document.getElementById("summary");
+  summary.className = fails ? "bad" : "ok";
+  summary.textContent = fails ? `${fails} of ${total} FAILED` : `All ${total} tests passed`;
+  document.title = (fails ? "FAIL — " : "PASS — ") + document.title;
+}
+
+const appFrame = document.getElementById("app");
+appFrame.addEventListener("load", function () {
+  const win = this.contentWindow;
+  if (win && win.isCorrectAnswer && win.matchCount && win.matchedIndices && win.masteryFromStat
+      && win.advanceStreak && win.bumpDaily && win.tierFor
+      && win.vadShouldStop && win.downsample && win.encodeWav) {
+    run(win);
+  } else {
+    const summary = document.getElementById("summary");
+    summary.className = "bad";
+    summary.textContent = "Could not reach the app's grading functions — is index.html served from the same folder?";
+  }
+});
+// Cache-bust so the runner always loads the current index.html, not a cached copy.
+appFrame.src = "index.html?t=" + Date.now();
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "static",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["server.js"],
+      "port": 8321
+    },
+    {
+      "name": "civics-dev",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["PORT=8330", "node", "server.js"],
+      "port": 8330
+    }
+  ]
+}

@@ -1,0 +1,2984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>U.S. Civics Test Study App — 2008 Test</title>
+<style>
+  :root {
+    --ink: #22252a;
+    --ink-soft: #4a4f57;
+    --bg: #f5f4f0;
+    --card: #ffffff;
+    --navy: #1e4b79;
+    --navy-dark: #16385b;
+    --line: #767676;
+    --green: #1e6b34;
+    --red: #9d2f2f;
+    --badge-ink: #7a5900;
+    --badge-bg: #fff4d6;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  .wrap { max-width: 42rem; margin: 0 auto; padding: 0 1rem 3rem; }
+
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px;
+    margin: -1px; padding: 0; border: 0;
+    clip: rect(0 0 0 0); clip-path: inset(50%);
+    overflow: hidden; white-space: nowrap;
+  }
+
+  :focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+  /* tabindex="-1" is used here only for non-interactive focus anchors (the view
+     headings and the quiz score/early-stop headings) that receive programmatic
+     .focus() to manage scroll/keyboard position on view or state changes. iOS Safari
+     draws an outline around them after a tap, which reads as a stray box. Suppress
+     the ring on all such anchors; real controls keep their :focus-visible outline. */
+  [tabindex="-1"]:focus, [tabindex="-1"]:focus-visible { outline: none; }
+
+  header { padding-top: 1.25rem; }
+  h1 { font-size: 1.4rem; margin: 0 0 0.25rem; }
+  .subtitle { margin: 0 0 1rem; color: var(--ink-soft); }
+
+  nav[aria-label="Study mode"] {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem;
+  }
+  nav[aria-label="Study mode"] button {
+    flex: 1 1 auto;
+    min-height: 44px;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+    border: 2px solid var(--navy);
+    border-radius: 8px;
+    background: var(--card);
+    color: var(--navy-dark);
+    cursor: pointer;
+  }
+  nav[aria-label="Study mode"] button[aria-current="true"] {
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  h2 { font-size: 1.25rem; margin: 0 0 1rem; }
+  h3 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
+
+  .filters { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+  .filters label { font-weight: 600; }
+  .filters select {
+    display: block; width: 100%; min-height: 44px;
+    font-size: 1rem; margin-top: 0.25rem;
+    border: 2px solid var(--line); border-radius: 8px;
+    background: var(--card); color: var(--ink); padding: 0.4rem;
+  }
+  .greeting {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding: 1.25rem 0.5rem 0.75rem;
+  }
+  .greet-line {
+    margin: 0 0 0.35rem;
+    font-size: 1.3rem;
+    line-height: 1.5;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .greet-line[lang="bn"] { font-weight: 600; }
+  .heart {
+    position: absolute;
+    bottom: 0;
+    color: #B03060;
+    font-size: 1.1rem;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .heart:nth-child(1) { left: 18%; }
+  .heart:nth-child(2) { left: 50%; font-size: 1.4rem; }
+  .heart:nth-child(3) { left: 78%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .greeting:not(.greeting-done) .greet-line {
+      animation: greet 4s ease-in-out both;
+    }
+    .greeting:not(.greeting-done) .greet-line[lang="bn"] { animation-delay: 0.4s; }
+    .greeting:not(.greeting-done) .heart { animation: heart-float 3s ease-out both; }
+    .greeting:not(.greeting-done) .heart:nth-child(2) { animation-delay: 0.6s; }
+    .greeting:not(.greeting-done) .heart:nth-child(3) { animation-delay: 1.2s; }
+  }
+  @keyframes greet {
+    0%   { opacity: 0; transform: translateY(14px); color: #B03060; }
+    18%  { opacity: 1; transform: none; color: #B03060; text-shadow: 0 1px 14px rgba(176,48,96,0.35); }
+    70%  { color: #B03060; text-shadow: 0 1px 12px rgba(176,48,96,0.2); }
+    100% { color: var(--ink); text-shadow: none; }
+  }
+  @keyframes heart-float {
+    0%   { opacity: 0; transform: translateY(10px) scale(0.8); }
+    20%  { opacity: 0.85; }
+    100% { opacity: 0; transform: translateY(-52px) scale(1.15); }
+  }
+
+  .home-cards { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+  .home-card {
+    display: block; width: 100%; text-align: left;
+    background: var(--card);
+    border: 2px solid var(--navy);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    font: inherit; cursor: pointer;
+    min-height: 44px;
+  }
+  .home-card[hidden] { display: none; }
+  .home-card-title { display: block; font-size: 1.15rem; font-weight: 700; color: var(--navy-dark); }
+  .home-card-desc { display: block; margin-top: 0.15rem; color: var(--ink-soft); }
+
+  .counter { font-weight: 600; margin: 0 0 0.5rem; }
+
+  .card {
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+  }
+  .card-btn {
+    display: block; width: 100%;
+    border: 0; background: none; cursor: pointer;
+    text-align: left; padding: 1.25rem;
+    font: inherit; color: inherit;
+    min-height: 44px;
+  }
+  .q-text { display: block; font-size: 1.4rem; line-height: 1.45; font-weight: 700; }
+  .hint { display: block; margin-top: 0.75rem; color: var(--navy-dark); font-weight: 600; }
+  .answer-panel { padding: 0 1.25rem 1.25rem; border-top: 2px solid #d8d5cd; }
+  .answer-panel[hidden] { display: none; }
+  .answer-panel h4 { margin: 1rem 0 0.25rem; font-size: 1rem; }
+  .answer-panel ul { margin: 0.25rem 0 0; padding-left: 1.4rem; font-size: 1.15rem; }
+  .answer-panel li { margin-bottom: 0.3rem; }
+
+  .note { color: var(--ink-soft); font-size: 0.95rem; margin: 0.75rem 0 0; }
+
+  /* Flashcard self-review progress — gold ring + bar (distinct from the tested-mastery
+     Home ring); turns green on completion. Ring/bar decorative; count also in text. */
+  .deck-review { display: flex; align-items: center; gap: 0.85rem; margin: 0 0 1rem;
+    padding: 0.65rem 0.85rem; background: var(--card); border: 1px solid var(--line);
+    border-left: 4px solid #c9962a; border-radius: 12px; }
+  .review-ring-wrap { position: relative; flex: 0 0 auto; width: 64px; height: 64px; }
+  .review-ring { width: 64px; height: 64px; transform: rotate(-90deg); }
+  .review-track { fill: none; stroke: #e2e0d8; stroke-width: 8; }
+  .review-fill { fill: none; stroke: #c9962a; stroke-width: 8; stroke-linecap: round;
+    transition: stroke-dashoffset 0.5s ease; }
+  .review-center { position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; line-height: 1; }
+  .review-center strong { font-size: 1.25rem; color: var(--navy-dark); }
+  .review-center span { font-size: 0.7rem; color: var(--ink-soft); }
+  .review-copy { flex: 1 1 auto; min-width: 0; }
+  .deck-title { margin: 0 0 0.4rem; font-weight: 700; color: var(--navy-dark); font-size: 0.98rem; }
+  .deck-msg { margin: 0.4rem 0 0; color: var(--ink-soft); font-size: 0.9rem; }
+  .deck-review .review-bar { background: #c9962a; }
+  .deck-review.complete { border-left-color: var(--green); }
+  .deck-review.complete .review-fill { stroke: var(--green); }
+  .deck-review.complete .review-bar { background: var(--green); }
+  @media (prefers-reduced-motion: reduce) { .review-fill { transition: none; } }
+  .answer-emoji { font-size: 2.6rem; line-height: 1; text-align: center; margin: 0.75rem 0 0.25rem; }
+  .answer-emoji[hidden] { display: none; }
+  .answer-emoji .answer-art { width: 4.4rem; height: 4.4rem; display: block; margin: 0 auto; }
+  .browse-q .answer-art { width: 1.5em; height: 1.5em; vertical-align: -0.3em; }
+  #card-bn { margin-top: 0.5rem; }
+  .card-rate { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1.1rem; }
+  .card-rate button {
+    flex: 1 1 auto; min-height: 48px; min-width: 44px;
+    padding: 0.6rem 1rem; font-size: 1rem; font-weight: 700;
+    border-radius: 8px; cursor: pointer; border: 2px solid var(--navy);
+    background: var(--card);
+  }
+  .card-rate .knew { border-color: var(--green); color: var(--green); }
+  .card-rate .again { color: var(--navy-dark); }
+
+  .badge {
+    display: inline-block;
+    background: var(--badge-bg);
+    color: var(--badge-ink);
+    border: 1px solid var(--badge-ink);
+    border-radius: 6px;
+    padding: 0.1rem 0.45rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+  .row button, .btn {
+    min-height: 48px; min-width: 44px;
+    padding: 0.6rem 1rem; font-size: 1rem; font-weight: 600;
+    border-radius: 8px; cursor: pointer;
+    border: 2px solid var(--navy);
+    background: var(--navy); color: #fff;
+  }
+  .btn-quiet, .row .btn-quiet, .quiz-options .btn-quiet { background: var(--card); color: var(--navy-dark); }
+  .btn-correct { background: var(--card); border-color: var(--green); color: var(--green); }
+  .btn-wrong  { background: var(--card); border-color: var(--red); color: var(--red); }
+
+  .progress { font-weight: 700; margin: 0 0 0.5rem; }
+  .pass-line { font-size: 1.2rem; font-weight: 700; }
+  .pass-line.pass { color: var(--green); }
+  .pass-line.fail { color: var(--red); }
+  .best-line { font-weight: 600; color: var(--badge-ink); margin: 0.25rem 0 0.5rem; }
+  .streak-pips { margin: 0 0 0.75rem; font-weight: 700; color: var(--green); }
+  .streak-pips .pips { letter-spacing: 0.15em; margin-right: 0.35rem; }
+  .streak-count { font-size: 0.95rem; }
+
+  .milestone-host {
+    position: fixed; left: 50%; bottom: 1.25rem; transform: translateX(-50%);
+    z-index: 30; display: flex; flex-direction: column; gap: 0.6rem;
+    width: min(92vw, 26rem); pointer-events: none;
+  }
+  .milestone {
+    pointer-events: auto;
+    background: var(--card); border: 2px solid var(--navy); border-left: 6px solid var(--green);
+    border-radius: 12px; box-shadow: 0 6px 24px rgba(0,0,0,0.18); padding: 0.9rem 1rem;
+  }
+  .milestone-title { margin: 0 0 0.25rem; font-weight: 800; font-size: 1.15rem; color: var(--navy-dark); }
+  .milestone-body { margin: 0 0 0.7rem; }
+  .milestone-close {
+    min-height: 40px; padding: 0.4rem 0.9rem; border-radius: 8px; cursor: pointer;
+    border: 2px solid var(--navy); background: var(--navy); color: #fff; font-weight: 700;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .milestone { animation: mile-in 0.4s ease-out both; }
+  }
+  @keyframes mile-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  .browse-list { list-style: none; padding-left: 0; }
+  .browse-list > li { margin-bottom: 1.4rem; padding-bottom: 1.1rem; border-bottom: 1px solid var(--line); }
+  .browse-list > li:last-child { border-bottom: 0; }
+  .browse-q { font-weight: 700; font-size: 1.05rem; margin: 0; }
+  .qnum { display: inline-block; font-size: 0.85rem; font-weight: 700; color: #fff;
+    background: var(--navy); border-radius: 6px; padding: 0.05rem 0.45rem; margin-right: 0.35rem; }
+  .browse-list ul { margin: 0.25rem 0 0; padding-left: 1.3rem; }
+  .quest { margin: 0 0 1.5rem; }
+  .quest-label { margin: 0 0 0.35rem; font-weight: 700; color: var(--navy-dark); }
+  .read-toggle { margin-top: 0.6rem; background: none; border: 1px solid var(--line); color: var(--navy-dark);
+    border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .read-toggle.is-read { border-color: var(--green); color: var(--green); }
+  .read-icon { margin-right: 0.1rem; }
+  .bn-toggle { margin-top: 0.5rem; background: none; border: 1px solid var(--line); color: var(--navy-dark);
+    border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .bn-toggle:hover { background: var(--card); }
+  .bn-panel { margin-top: 0.5rem; padding: 0.65rem 0.85rem; background: var(--card);
+    border: 1px solid var(--line); border-left: 3px solid var(--navy); border-radius: 8px; }
+  .bn-disclaimer { margin: 0 0 0.45rem; font-size: 0.85rem; color: var(--ink-soft); }
+  .bn-q { font-weight: 700; margin: 0 0 0.25rem; }
+  .bn-panel ul { margin: 0.2rem 0 0; padding-left: 1.3rem; }
+  .bn-note { margin: 0.45rem 0 0; font-size: 0.8rem; color: var(--ink-soft); font-style: italic; }
+  .self-note { font-weight: 400; font-size: 0.8rem; color: var(--ink-soft); }
+  .ans-emoji { font-style: normal; margin-right: 0.1rem; }
+  /* Quiet, low-key reset control on the Home hero (destructive, so understated). */
+  .reset-wrap { margin-top: 1rem; }
+  .reset-btn { background: none; border: 1px solid var(--line); color: var(--ink-soft);
+    border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.85rem; cursor: pointer; }
+  .reset-btn:hover { background: var(--card); }
+  .reset-confirm { margin: 0 0 0.5rem; font-weight: 600; color: var(--navy-dark); }
+  /* Per-question tutor in Browse: a navy-outlined pill (a touch more noticeable than
+     the grey bn/read toggles) that expands an inline chat panel on demand. */
+  .ask-toggle { margin-top: 0.5rem; margin-left: 0.4rem; background: none; border: 1px solid var(--navy);
+    color: var(--navy-dark); border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .ask-toggle:hover { background: var(--card); }
+  .ask-toggle[hidden] { display: none; }
+  .ask-panel { margin-top: 0.5rem; padding: 0.5rem 0.65rem; background: var(--card);
+    border: 1px solid var(--line); border-left: 3px solid var(--navy); border-radius: 8px; }
+  .ask-panel[hidden] { display: none; }
+
+  .missed { list-style: none; padding: 0; }
+  .missed > li {
+    background: var(--card); border: 2px solid var(--line);
+    border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem;
+  }
+  .missed p { margin: 0 0 0.4rem; }
+  .missed .correct-label { font-weight: 700; color: var(--green); }
+
+  .vocab { display: flex; flex-wrap: wrap; gap: 0.4rem; padding: 0; list-style: none; margin: 0.5rem 0 0; }
+  .vocab li {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 6px; padding: 0.2rem 0.55rem;
+  }
+
+  .quiz-options { display: flex; flex-direction: column; gap: 0.75rem; align-items: stretch; }
+  .quiz-options .btn, .quiz-options .btn-quiet { text-align: left; }
+  .btn-sub { display: block; font-weight: 400; font-size: 0.9rem; margin-top: 0.1rem; }
+
+  .quiz-label, .drill-label { display: block; font-weight: 600; margin-top: 0.75rem; }
+  .quiz-need { margin: 0.25rem 0 0; color: var(--ink-soft); font-size: 0.95rem; }
+  .recheck { display: flex; align-items: center; gap: 0.5rem; margin: 0.5rem 0 0; color: var(--ink-soft); }
+  .spinner { width: 1em; height: 1em; border: 2px solid var(--ink-soft); border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: var(--ink-soft); opacity: 0.4; } }
+  input[type="text"] {
+    display: block; width: 100%;
+    min-height: 48px; font-size: 1.1rem;
+    border: 2px solid var(--line); border-radius: 8px;
+    padding: 0.5rem 0.75rem; margin: 0.35rem 0 0.75rem;
+    background: var(--card); color: var(--ink);
+  }
+  .verdict-good { color: var(--green); font-weight: 700; font-size: 1.15rem; margin: 0.75rem 0 0.5rem; }
+  .verdict-bad { color: var(--red); font-weight: 700; margin: 0.75rem 0 0.5rem; }
+  .typed-echo { color: var(--ink-soft); margin: 0 0 0.5rem; }
+
+  .love-note {
+    text-align: center; font-size: 1.2rem; font-weight: 600;
+    color: #B03060; margin: 1.25rem 0;
+  }
+
+  /* Mock interview (spoken ceremony) */
+  .convo-stage { border-left: 5px solid var(--navy); }
+  .convo-officer { margin: 0; font-size: 1.05rem; line-height: 1.5; }
+  .convo-who { display: block; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em;
+    text-transform: uppercase; color: var(--ink-soft); margin-bottom: 0.15rem; }
+  .convo-subject { margin: 0.75rem 0 0; }
+  .convo-hint { margin: 0.6rem 0 0; color: var(--ink-soft); }
+  .convo-status { min-height: 1.4em; margin: 0.6rem 0; color: var(--ink-soft); font-weight: 600; }
+  .convo-caption { margin: 0.75rem 0; font-style: italic; color: var(--ink); }
+  .convo-modes { border: 2px solid var(--line); border-radius: 12px; padding: 0.75rem 1rem 1rem; margin: 1rem 0; }
+  .convo-modes legend { font-weight: 700; padding: 0 0.4rem; }
+  .convo-mode { display: flex; gap: 0.6rem; align-items: flex-start; margin: 0.6rem 0; cursor: pointer; }
+  .convo-mode input { margin-top: 0.35rem; flex: 0 0 auto; }
+  #convo-mic[aria-pressed="true"] { background: var(--red); border-color: var(--red); }
+  .convo-scorecard { list-style: none; padding: 0; margin: 0.75rem 0; }
+  .convo-scorecard li { padding: 0.5rem 0.75rem; margin: 0.4rem 0; border: 2px solid var(--line);
+    border-radius: 10px; background: var(--card); }
+  @media (prefers-reduced-motion: reduce) {
+    #convo-mic[aria-pressed="true"] { animation: none; }
+  }
+
+  .home-stats { margin-top: 1.75rem; }
+  .stat-line { margin: 0.25rem 0; }
+  .stat-weak { color: var(--badge-ink); font-weight: 600; }
+
+  .hero-top { display: flex; gap: 1.1rem; align-items: center; margin-top: 0.5rem; }
+  .ring-wrap { position: relative; flex: 0 0 auto; width: 120px; height: 120px; }
+  .ring { width: 120px; height: 120px; transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: #e2e0d8; stroke-width: 12; }
+  .ring-fill { fill: none; stroke: var(--green); stroke-width: 12; stroke-linecap: round; }
+  .ring-center { position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; }
+  .ring-center strong { font-size: 2rem; line-height: 1; color: var(--navy-dark); }
+  .ring-center span { font-size: 0.85rem; color: var(--ink-soft); }
+  .hero-copy { flex: 1 1 12rem; }
+  .hero-count { font-weight: 700; font-size: 1.1rem; margin: 0 0 0.3rem; }
+  .hero-legend { font-size: 0.9rem; color: var(--ink-soft); margin: 0 0 0.4rem; }
+  .hero-msg { margin: 0; }
+  .category-bars { list-style: none; padding: 0; margin: 1.4rem 0 0;
+    display: flex; flex-direction: column; gap: 0.7rem; }
+  .bar-row { display: flex; justify-content: space-between; gap: 0.5rem;
+    font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .cat-name { font-weight: 600; }
+  .cat-count { color: var(--ink-soft); white-space: nowrap; }
+  .bar { display: block; height: 10px; background: #e2e0d8; border-radius: 999px; overflow: hidden; }
+  .bar-fill { display: block; height: 100%; background: var(--navy); border-radius: 999px; }
+  .home-stats .stat-weak { margin-top: 1.1rem; }
+
+  .readiness { margin-top: 1.4rem; padding: 0.9rem 1rem; border-radius: 12px;
+    border: 1px solid var(--line); border-left: 6px solid var(--line); background: var(--card); }
+  .readiness-notyet { border-left-color: var(--badge-ink); }
+  .readiness-almost { border-left-color: var(--navy); }
+  .readiness-ready  { border-left-color: var(--green); }
+  .readiness-h { margin: 0 0 0.2rem; font-size: 0.9rem; text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--ink-soft); }
+  .readiness-stage { margin: 0 0 0.5rem; font-size: 1.15rem; font-weight: 800; color: var(--navy-dark); }
+  .readiness-notyet .readiness-stage { color: var(--badge-ink); }
+  .readiness-ready .readiness-stage { color: var(--green); }
+  .meter { display: block; height: 12px; background: #e2e0d8; border-radius: 999px; overflow: hidden; }
+  .meter-fill { display: block; height: 100%; border-radius: 999px; background: var(--navy); }
+  .readiness-notyet .meter-fill { background: var(--badge-ink); }
+  .readiness-ready .meter-fill { background: var(--green); }
+  .readiness-copy { margin: 0.5rem 0 0; }
+
+  /* ---- N1: momentum, daily habit, sound toggle ---- */
+  .tier-badge { display: inline-block; font-weight: 700; font-size: 0.82rem; padding: 0.15rem 0.6rem;
+    border-radius: 999px; margin: 0 0 0.45rem; }
+  .tier-begin, .tier-started { background: #fff4e0; color: #8a5a00; }   /* ≥4.5:1 */
+  .tier-feet, .tier-half { background: #e8f0fe; color: #1e5fbf; }
+  .tier-almost, .tier-ready { background: #e7f5ec; color: #116932; }
+  .today { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; margin: 0.25rem 0 1rem;
+    padding: 0.7rem 0.9rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+  .today-streak { display: flex; align-items: center; gap: 0.5rem; }
+  .flame { font-size: 1.7rem; line-height: 1; }
+  .today-streak-text strong { font-size: 1.3rem; color: var(--navy-dark); }
+  .streak-best { color: var(--ink-soft); font-size: 0.85rem; }
+  .today-goal { display: flex; align-items: center; gap: 0.6rem; margin-left: auto; }
+  .goal-ring-wrap { position: relative; flex: 0 0 auto; width: 48px; height: 48px; }
+  .goal-ring { width: 48px; height: 48px; transform: rotate(-90deg); }
+  .goal-track { fill: none; stroke: #e2e0d8; stroke-width: 6; }
+  .goal-fill { fill: none; stroke: #c9962a; stroke-width: 6; stroke-linecap: round; }
+  .goal-center { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.85rem; color: var(--navy-dark); }
+  .goal-text { margin: 0; font-size: 0.9rem; color: var(--ink-soft); }
+  .home-note { margin: 0.75rem 0 0; font-style: italic; color: var(--navy-dark); }
+  .prefs { margin-top: 1rem; }
+  .pref-toggle { background: none; border: 1px solid var(--line); color: var(--navy-dark);
+    border-radius: 999px; padding: 0.3rem 0.8rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+  .pref-toggle[aria-pressed="true"] { border-color: var(--green); color: var(--green); }
+
+  /* ---- N1-B: micro-interactions (all gated by prefers-reduced-motion below) ---- */
+  button:active { transform: scale(0.97); }
+  @keyframes vpulse { 0% { transform: scale(1); } 40% { transform: scale(1.07); } 100% { transform: scale(1); } }
+  .verdict-good.pulse { animation: vpulse 0.5s ease; }
+  @keyframes vshake { 0% { transform: translateX(0); } 25% { transform: translateX(-6px); }
+    50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } 100% { transform: translateX(0); } }
+  .verdict-bad.shake { animation: vshake 0.35s ease; }
+  @keyframes reveal { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .answer-panel:not([hidden]) { animation: reveal 0.28s ease; }
+  @media (prefers-reduced-motion: reduce) {
+    button:active { transform: none; }
+    .verdict-good.pulse, .verdict-bad.shake, .answer-panel:not([hidden]) { animation: none; }
+  }
+
+  .card-pad { padding: 1.25rem; }
+  .drill-note { color: var(--ink-soft); font-size: 0.95rem; }
+
+  .tutor-slot { margin-top: 0.75rem; }
+  .chat-log { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.75rem 0; }
+  .chat-msg {
+    max-width: 85%; padding: 0.6rem 0.9rem;
+    border-radius: 12px; white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  .chat-user { align-self: flex-end; background: var(--navy); color: #fff; border-bottom-right-radius: 4px; }
+  .chat-assistant { align-self: flex-start; background: var(--card); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
+  .chat-form { display: flex; gap: 0.5rem; align-items: stretch; }
+  .chat-form input { flex: 1; margin: 0; }
+  .chat-form .btn { flex-shrink: 0; }
+
+  .confetti { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 10; }
+  .confetti span {
+    position: absolute; top: -28px;
+    width: 10px; height: 14px; border-radius: 2px;
+    animation: confetti-fall linear both;
+  }
+  .confetti .confetti-heart { width: auto; height: auto; background: none; font-size: 1.15rem; }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(0) rotate(0deg); }
+    100% { transform: translateY(105vh) rotate(540deg); opacity: 0.7; }
+  }
+
+  footer {
+    margin-top: 3rem; padding-top: 1rem;
+    border-top: 2px solid #d8d5cd;
+    font-size: 0.95rem; color: var(--ink-soft);
+  }
+  footer ul { padding-left: 1.3rem; }
+  footer a { color: var(--navy-dark); }
+
+  @media (min-width: 480px) {
+    .filters { flex-direction: row; align-items: flex-end; }
+    .filters > div { flex: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>U.S. Civics Test Study App</h1>
+  <p class="subtitle">2008 test &mdash; all 100 official USCIS questions. The officer asks up to 10; answer 6 correctly to pass.</p>
+  <nav aria-label="Study mode">
+    <button type="button" data-mode="home" aria-current="true">Home</button>
+  </nav>
+</header>
+
+<main>
+
+  <section id="view-home" aria-labelledby="h-home">
+    <div class="greeting" id="greeting">
+      <span class="heart" aria-hidden="true">&#10084;</span>
+      <span class="heart" aria-hidden="true">&#10084;</span>
+      <span class="heart" aria-hidden="true">&#10084;</span>
+      <p class="greet-line">You got this, my beautiful, sexy Meri Jaan. Love you.</p>
+      <p class="greet-line" lang="bn">তুমি পারবে, আমার সুন্দরী সেক্সি জান। তোমাকে ভালোবাসি।</p>
+    </div>
+    <h2 id="h-home" tabindex="-1">Choose how to study</h2>
+    <div class="home-cards">
+      <button type="button" class="home-card" data-mode="flash">
+        <span class="home-card-title">Flashcards</span>
+        <span class="home-card-desc">Practice one question at a time.</span>
+      </button>
+      <button type="button" class="home-card" data-mode="quiz">
+        <span class="home-card-title">Quiz</span>
+        <span class="home-card-desc">Take a 10-question practice test.</span>
+      </button>
+      <button type="button" class="home-card" data-mode="browse">
+        <span class="home-card-title">Browse All</span>
+        <span class="home-card-desc">Read all the questions and answers.</span>
+      </button>
+      <button type="button" class="home-card" data-mode="interview">
+        <span class="home-card-title">Interview Day</span>
+        <span class="home-card-desc">Reading and writing practice, word lists, what to bring.</span>
+      </button>
+      <button type="button" class="home-card" data-mode="conversation" id="home-card-conversation" hidden>
+        <span class="home-card-title">Mock Interview 🎤</span>
+        <span class="home-card-desc">Speak your answers out loud, like the real officer &mdash; greeting, civics, reading, and writing.</span>
+      </button>
+      <button type="button" class="home-card" data-mode="tutor" id="home-card-tutor" hidden>
+        <span class="home-card-title">Tutor</span>
+        <span class="home-card-desc">Chat with your study coach.</span>
+      </button>
+    </div>
+    <div id="migrate-slot"></div>
+    <div id="home-stats" class="home-stats"></div>
+  </section>
+
+  <section id="view-flash" aria-labelledby="h-flash" hidden>
+    <h2 id="h-flash" tabindex="-1">Flashcards</h2>
+    <div class="filters">
+      <div>
+        <label for="cat-filter">Category
+          <select id="cat-filter">
+            <option value="All">All categories</option>
+            <option value="Government">American Government</option>
+            <option value="History">American History</option>
+            <option value="Civics">Integrated Civics</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <p class="counter" id="flash-counter">Question 1 of 100</p>
+    <div class="deck-review" id="flash-mastered"></div>
+    <div class="card">
+      <button type="button" class="card-btn" id="card-btn" aria-expanded="false" aria-controls="card-answer">
+        <span class="q-text" id="card-q"></span>
+        <span class="hint" id="card-hint">Show answer</span>
+      </button>
+      <div class="answer-panel" id="card-answer" hidden>
+        <div class="answer-emoji" id="card-emoji" aria-hidden="true" hidden></div>
+        <h4>Answer</h4>
+        <ul id="card-answer-list"></ul>
+        <p id="card-badge" hidden></p>
+        <p class="note" id="card-note" hidden></p>
+        <div class="tutor-slot" id="card-tutor"></div>
+        <div id="card-bn"></div>
+        <div class="card-rate">
+          <button type="button" class="knew" id="card-knew">I knew it ✓</button>
+          <button type="button" class="again" id="card-again">Show me again</button>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <button type="button" id="prev-btn">Previous</button>
+      <button type="button" id="next-btn">Next</button>
+      <button type="button" id="shuffle-btn" class="btn-quiet">Shuffle</button>
+    </div>
+  </section>
+
+  <section id="view-quiz" aria-labelledby="h-quiz" hidden>
+    <h2 id="h-quiz" tabindex="-1">Quiz</h2>
+    <div id="quiz-body"></div>
+  </section>
+
+  <section id="view-conversation" aria-labelledby="h-conversation" hidden>
+    <h2 id="h-conversation" tabindex="-1">Mock Interview</h2>
+    <div id="convo-body"></div>
+  </section>
+
+  <section id="view-tutor" aria-labelledby="h-tutor" hidden>
+    <h2 id="h-tutor" tabindex="-1">Tutor</h2>
+    <p>Ask anything about the civics test, in simple English &mdash; what a word means, why an answer is right, or for a trick to remember it.</p>
+    <div id="tutor-chat"></div>
+  </section>
+
+  <section id="view-browse" aria-labelledby="h-browse" hidden>
+    <h2 id="h-browse" tabindex="-1">All Questions</h2>
+    <div id="browse-body"></div>
+  </section>
+
+  <section id="view-interview" aria-labelledby="h-interview" hidden>
+    <h2 id="h-interview" tabindex="-1">Interview Day</h2>
+
+    <h3>How the test works</h3>
+    <p>The civics test is oral. The USCIS officer asks up to 10 of the 100 questions. You must answer 6 correctly to pass. You also read one sentence in English and write one sentence in English.</p>
+    <p><strong>Important:</strong> this app covers the <strong>2008 civics test</strong>. USCIS also has a newer 2025 test. Your interview notice and your N-400 filing date decide which test you take &mdash; confirm at <a href="https://www.uscis.gov/citizenship">uscis.gov/citizenship</a>.</p>
+
+    <h3>Reading practice</h3>
+    <p>On test day you read one sentence out loud. Practice with these &mdash; every word comes from the official USCIS reading list. <span class="drill-note">Read it out loud, then press &ldquo;Hear it&rdquo; to check yourself.</span></p>
+    <div id="reading-drill"></div>
+
+    <h3>Writing practice</h3>
+    <p>The officer says a sentence and you write it. Press play, listen, and type what you hear &mdash; every word comes from the official USCIS writing list.</p>
+    <div id="writing-drill"></div>
+
+    <h3>Reading vocabulary (official USCIS list)</h3>
+    <p>The sentence you read aloud uses only these words:</p>
+    <h4>People</h4>
+    <ul class="vocab"><li>Abraham Lincoln</li><li>George Washington</li></ul>
+    <h4>Civics</h4>
+    <ul class="vocab"><li>American flag</li><li>Bill of Rights</li><li>capital</li><li>citizen</li><li>city</li><li>Congress</li><li>country</li><li>Father of Our Country</li><li>government</li><li>President</li><li>right</li><li>Senators</li><li>state/states</li><li>White House</li></ul>
+    <h4>Places</h4>
+    <ul class="vocab"><li>America</li><li>United States</li><li>U.S.</li></ul>
+    <h4>Holidays</h4>
+    <ul class="vocab"><li>Presidents&rsquo; Day</li><li>Memorial Day</li><li>Flag Day</li><li>Independence Day</li><li>Labor Day</li><li>Columbus Day</li><li>Thanksgiving</li></ul>
+    <h4>Question words</h4>
+    <ul class="vocab"><li>How</li><li>What</li><li>When</li><li>Where</li><li>Who</li><li>Why</li></ul>
+    <h4>Verbs</h4>
+    <ul class="vocab"><li>can</li><li>come</li><li>do/does</li><li>elects</li><li>have/has</li><li>is/are/was/be</li><li>lives/lived</li><li>meet</li><li>name</li><li>pay</li><li>vote</li><li>want</li></ul>
+    <h4>Other (function)</h4>
+    <ul class="vocab"><li>a</li><li>for</li><li>here</li><li>in</li><li>of</li><li>on</li><li>the</li><li>to</li><li>we</li></ul>
+    <h4>Other (content)</h4>
+    <ul class="vocab"><li>colors</li><li>dollar bill</li><li>first</li><li>largest</li><li>many</li><li>most</li><li>north</li><li>one</li><li>people</li><li>second</li><li>south</li></ul>
+
+    <h3>Writing vocabulary (official USCIS list)</h3>
+    <p>The sentence you write uses only these words:</p>
+    <h4>People</h4>
+    <ul class="vocab"><li>Adams</li><li>Lincoln</li><li>Washington</li></ul>
+    <h4>Civics</h4>
+    <ul class="vocab"><li>American Indians</li><li>capital</li><li>citizens</li><li>Civil War</li><li>Congress</li><li>Father of Our Country</li><li>flag</li><li>free</li><li>freedom of speech</li><li>President</li><li>right</li><li>Senators</li><li>state/states</li><li>White House</li></ul>
+    <h4>Places</h4>
+    <ul class="vocab"><li>Alaska</li><li>California</li><li>Canada</li><li>Delaware</li><li>Mexico</li><li>New York City</li><li>United States</li><li>Washington</li><li>Washington, D.C.</li></ul>
+    <h4>Months</h4>
+    <ul class="vocab"><li>February</li><li>May</li><li>June</li><li>July</li><li>September</li><li>October</li><li>November</li></ul>
+    <h4>Holidays</h4>
+    <ul class="vocab"><li>Presidents&rsquo; Day</li><li>Memorial Day</li><li>Flag Day</li><li>Independence Day</li><li>Labor Day</li><li>Columbus Day</li><li>Thanksgiving</li></ul>
+    <h4>Verbs</h4>
+    <ul class="vocab"><li>can</li><li>come</li><li>elect</li><li>have/has</li><li>is/was/be</li><li>lives/lived</li><li>meets</li><li>pay</li><li>vote</li><li>want</li></ul>
+    <h4>Other (function)</h4>
+    <ul class="vocab"><li>and</li><li>during</li><li>for</li><li>here</li><li>in</li><li>of</li><li>on</li><li>the</li><li>to</li><li>we</li></ul>
+    <h4>Other (content)</h4>
+    <ul class="vocab"><li>blue</li><li>dollar bill</li><li>fifty/50</li><li>first</li><li>largest</li><li>most</li><li>north</li><li>one</li><li>one hundred/100</li><li>people</li><li>red</li><li>second</li><li>south</li><li>taxes</li><li>white</li></ul>
+
+    <h3>What to bring</h3>
+    <p><strong>Your interview appointment notice lists exactly what to bring &mdash; follow it.</strong> The items below are asked for at every interview:</p>
+    <ul>
+      <li>Your interview appointment notice</li>
+      <li>Your Permanent Resident Card (green card)</li>
+      <li>A state ID or driver&rsquo;s license</li>
+      <li>All passports and travel documents, current and expired</li>
+    </ul>
+
+    <h3>Before the interview</h3>
+    <p>Answers marked <span class="badge">may change &mdash; checked July 16, 2026</span> are about current officials. The officer will not accept an outdated name. Re-check them the week of your interview at <a href="https://www.uscis.gov/citizenship/testupdates">uscis.gov/citizenship/testupdates</a>.</p>
+  </section>
+
+</main>
+
+<footer aria-labelledby="h-sources" hidden>
+  <h2 id="h-sources" style="font-size:1rem">Sources (all checked July 14, 2026; officeholders re-checked July 16, 2026)</h2>
+  <ul>
+    <li>Questions, answers, and the 20 starred questions: <a href="https://www.uscis.gov/sites/default/files/document/questions-and-answers/100q.pdf">official USCIS 100 questions PDF (2008 test)</a></li>
+    <li>Current officials (President, Vice President, Chief Justice, number of justices, Speaker, President&rsquo;s party): <a href="https://www.uscis.gov/citizenship/testupdates">USCIS Check for Test Updates</a></li>
+    <li>Texas senators: <a href="https://www.senate.gov/senators/">senate.gov</a> &middot; Governor: <a href="https://gov.texas.gov/">gov.texas.gov</a> &middot; Representatives: <a href="https://mccaul.house.gov/">mccaul.house.gov</a>, <a href="https://casar.house.gov/">casar.house.gov</a>, lookup at <a href="https://www.house.gov/representatives/find-your-representative">house.gov</a></li>
+    <li>Reading and writing word lists: official USCIS <a href="https://www.uscis.gov/sites/default/files/document/guides/reading_vocab.pdf">reading vocabulary</a> and <a href="https://www.uscis.gov/sites/default/files/document/guides/writing_vocab.pdf">writing vocabulary</a> PDFs</li>
+  </ul>
+</footer>
+
+</div>
+
+<div role="status" class="visually-hidden" id="live"></div>
+
+<script>
+"use strict";
+
+// Every question and answer below was transcribed from the official USCIS
+// 100 questions PDF (2008 test, rev. 01/19) on July 14, 2026. Officeholder
+// answers were verified against the USCIS Check for Test Updates page and
+// the officials' own .gov sites the same day, and re-verified July 16, 2026.
+// See SOURCES.md.
+const CHECKED = "July 16, 2026";
+const CATEGORY_NAMES = { Government: "American Government", History: "American History", Civics: "Integrated Civics" };
+// Decorative answer-side emoji for the concrete questions only (a place, object,
+// or event you can picture). Purely a memory hook — always aria-hidden and never
+// the sole meaning. Abstract definition/process questions are left plain on purpose.
+const ANSWER_EMOJI = {
+  1:"📜", 5:"📜", 66:"📜", 6:"🗣️", 9:"🕊️", 13:"🏛️", 94:"🏛️",
+  15:"🎖️", 32:"🎖️", 79:"🎖️", 80:"🎖️", 18:"💯", 27:"🗳️", 33:"✍️", 34:"❌",
+  38:"⚖️", 39:"9️⃣", 41:"💵", 44:"🤠", 45:"🐘🫏", 52:"🇺🇸", 96:"🇺🇸", 56:"🧾",
+  58:"⛵", 59:"🪶", 87:"🪶", 62:"✒️", 63:"📅", 72:"⚔️", 73:"⚔️", 78:"⚔️",
+  69:"🎩", 70:"🎩", 75:"🎩", 77:"♀️", 83:"❄️", 84:"✊", 85:"✊",
+  88:"🌊", 89:"🌊", 90:"🌊", 91:"🏝️", 92:"🍁", 93:"🌵", 95:"🗽",
+  97:"⭐", 98:"🎵", 99:"🎆", 100:"🎉",
+  // Broader coverage (reused by theme, the way ⚔️/🎖️ already are). The four hard-history
+  // questions carry respectful marks too: ⛓️ for slavery (Q60) and its role in the Civil
+  // War (Q74), 🕊️ for Emancipation/freedom (Q76), and 🕯️ (a memorial candle) for 9/11 (Q86).
+  2:"📜", 8:"📜",                              // founding documents
+  3:"👥", 24:"👥", 25:"👥",                    // people / representation
+  4:"✏️", 65:"✍️", 67:"📄",                   // amendments / writing / papers
+  19:"🗓️", 22:"🗓️", 26:"🗓️",                 // terms — "how many years"
+  16:"🏛️", 17:"🏛️", 20:"🏛️", 21:"🏛️", 23:"🏛️", // Congress / the legislature
+  28:"🏛️", 29:"🏛️", 30:"🏛️", 31:"🏛️", 43:"🏛️", 47:"🏛️", // offices of government
+  12:"⚖️", 14:"⚖️", 37:"⚖️", 40:"⚖️",          // law / justice / balance
+  48:"🗳️", 49:"🗳️", 50:"🗳️", 54:"🗳️", 55:"🙋", // voting / civic participation
+  35:"💼", 36:"💼",                            // the Cabinet
+  10:"🙏", 51:"🗣️",                           // freedom of religion / of speech
+  7:"🔢", 11:"📈", 42:"🚗", 53:"🤝", 57:"🪖",  // amendments count / economy / driver's license / oath / Selective Service
+  61:"💰", 64:"🗺️", 71:"🗺️", 68:"📚",         // taxes / states + territory maps / Franklin's writing & libraries
+  46:"🐘🫏", 81:"⚔️", 82:"⚔️",                 // parties / wars
+  60:"⛓️", 74:"⛓️", 76:"🕊️", 86:"🕯️"          // slavery / cause of Civil War / Emancipation / 9/11 remembrance
+};
+// Richer decorative illustrations for the most iconic, cleanly-drawable questions —
+// self-authored inline SVG (tiny, offline, no licensing). Where one exists it REPLACES
+// the emoji (one decorative mark per question). Every SVG is aria-hidden + focusable
+//="false" with no role/title, so it's invisible to assistive tech — the answer text
+// is what teaches (per the accessibility contract).
+const ANSWER_ART = {
+  38: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><g stroke="#16385b" stroke-width="1.6" fill="none" stroke-linecap="round"><line x1="24" y1="11" x2="24" y2="33"/><line x1="11" y1="15" x2="37" y2="15"/><line x1="11" y1="15" x2="7" y2="22"/><line x1="11" y1="15" x2="15" y2="22"/><line x1="37" y1="15" x2="33" y2="22"/><line x1="37" y1="15" x2="41" y2="22"/></g><circle cx="24" cy="11" r="2.2" fill="#c9962a"/><path d="M6 22 h10 l-2.6 5.4 a2.6 2.6 0 0 1 -4.8 0z" fill="#eef0f2" stroke="#16385b" stroke-width="1.1"/><path d="M32 22 h10 l-2.6 5.4 a2.6 2.6 0 0 1 -4.8 0z" fill="#eef0f2" stroke="#16385b" stroke-width="1.1"/><path d="M19 33 h10 l3 5 h-16z" fill="#16385b"/></svg>',
+  41: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><rect x="6" y="15" width="36" height="18" rx="2" fill="#dff0e6" stroke="#1e6b34" stroke-width="1.5"/><rect x="9" y="18" width="30" height="12" rx="1" fill="none" stroke="#1e6b34" stroke-width="0.9"/><circle cx="24" cy="24" r="5.4" fill="#bfe3cd" stroke="#1e6b34" stroke-width="1"/><line x1="24" y1="19.4" x2="24" y2="28.6" stroke="#1e6b34" stroke-width="1.5"/><path d="M26.6 21.2 q-2.6 -1.9 -4.3 0 q-1.5 1.7 .9 2.7 q3.2 1 1.7 2.7 q-1.7 1.8 -4.3 .1" fill="none" stroke="#1e6b34" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  44: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><rect x="6" y="14" width="36" height="20" fill="#fff" stroke="#16385b" stroke-width="1"/><rect x="20" y="24" width="22" height="10" fill="#9d2f2f"/><rect x="6" y="14" width="14" height="20" fill="#1e4b79"/><path d="M13 18.6 l1.5 3 3.3 .4 -2.4 2.2 .6 3.2 -3-1.5 -3 1.5 .6-3.2 -2.4-2.2 3.3-.4z" fill="#fff"/></svg>',
+  56: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><rect x="9" y="13" width="30" height="27" rx="2.5" fill="#fff" stroke="#16385b" stroke-width="1.5"/><path d="M9 21 h30 v-5.5 a2.5 2.5 0 0 0 -2.5 -2.5 h-25 a2.5 2.5 0 0 0 -2.5 2.5 z" fill="#1e4b79"/><line x1="16" y1="10" x2="16" y2="16" stroke="#16385b" stroke-width="2" stroke-linecap="round"/><line x1="32" y1="10" x2="32" y2="16" stroke="#16385b" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="30.5" r="5.8" fill="none" stroke="#9d2f2f" stroke-width="1.9"/></svg>',
+  72: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><g stroke-linecap="round"><line x1="13" y1="37" x2="35" y2="12" stroke="#8a9099" stroke-width="2.8"/><line x1="35" y1="37" x2="13" y2="12" stroke="#8a9099" stroke-width="2.8"/></g><g stroke="#c9962a" stroke-width="2.6" stroke-linecap="round"><line x1="11" y1="35" x2="15" y2="39"/><line x1="37" y1="35" x2="33" y2="39"/></g><g stroke="#7a5900" stroke-width="2.2" stroke-linecap="round"><line x1="13" y1="12" x2="17" y2="16"/><line x1="35" y1="12" x2="31" y2="16"/></g></svg>',
+  88: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><path d="M21 7 C 31 15, 14 20, 22 28 C 29 34, 17 38, 24 43" fill="none" stroke="#1e4b79" stroke-width="5.2" stroke-linecap="round"/><path d="M21 7 C 31 15, 14 20, 22 28 C 29 34, 17 38, 24 43" fill="none" stroke="#7fb0dc" stroke-width="2" stroke-linecap="round"/></svg>',
+  91: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><path d="M4 39 q6 -3 11 0 t11 0 t11 0 v5 h-44 z" fill="#1e4b79"/><ellipse cx="24" cy="38" rx="12" ry="3.4" fill="#d9c48f"/><path d="M23.4 38 C 22.6 31, 22 27, 21 24" fill="none" stroke="#7a5900" stroke-width="1.7"/><g fill="#3a8a6a"><path d="M21 24 q-8 -3.5 -11 1 q7 -1.2 11 1z"/><path d="M21 24 q8 -3.5 11 1 q-7 -1.2 -11 1z"/><path d="M21 24 q-4.5 -7 -9 -7 q4.5 2.2 9 7z"/><path d="M21 24 q4.5 -7 9 -7 q-4.5 2.2 -9 7z"/></g></svg>',
+  93: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><rect x="6" y="38" width="36" height="4" rx="1" fill="#d9c48f"/><g fill="#3a8a6a" stroke="#1e6b34" stroke-width="0.8"><rect x="21" y="14" width="6" height="26" rx="3"/><path d="M21 28 h-4 a3 3 0 0 0 -3 3 v4.5 a2 2 0 0 0 4 0 v-3.5 a1 1 0 0 1 3 0z"/><path d="M27 23 h4 a3 3 0 0 1 3 3 v6.5 a2 2 0 0 1 -4 0 v-5.5 a1 1 0 0 0 -3 0z"/></g></svg>',
+  98: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><g fill="#16385b"><ellipse cx="16" cy="34" rx="4.4" ry="3.3" transform="rotate(-20 16 34)"/><ellipse cx="33" cy="31" rx="4.4" ry="3.3" transform="rotate(-20 33 31)"/><rect x="19.4" y="13" width="1.9" height="20.5"/><rect x="36.4" y="10" width="1.9" height="20.5"/><path d="M19.4 13 L38.3 10 V14.4 L19.4 17.4 Z"/></g></svg>',
+  1: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><rect x="13" y="10" width="22" height="28" fill="#f3e6c4" stroke="#7a5900" stroke-width="1.6"/><line x1="18" y1="18" x2="30" y2="18" stroke="#7a5900" stroke-width="1.4"/><line x1="18" y1="23" x2="30" y2="23" stroke="#7a5900" stroke-width="1.4"/><line x1="18" y1="28" x2="27" y2="28" stroke="#7a5900" stroke-width="1.4"/><ellipse cx="24" cy="10" rx="11" ry="3.6" fill="#e2caa0" stroke="#7a5900" stroke-width="1.6"/><ellipse cx="24" cy="38" rx="11" ry="3.6" fill="#e2caa0" stroke="#7a5900" stroke-width="1.6"/></svg>',
+  13: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><g fill="#eef0f2" stroke="#16385b" stroke-width="1.2"><rect x="9" y="34" width="30" height="6"/><rect x="13" y="25" width="22" height="9"/><path d="M15 25 Q24 9 33 25 Z"/></g><g stroke="#16385b" stroke-width="1"><line x1="17" y1="26" x2="17" y2="33"/><line x1="21" y1="26" x2="21" y2="33"/><line x1="24" y1="26" x2="24" y2="33"/><line x1="27" y1="26" x2="27" y2="33"/><line x1="31" y1="26" x2="31" y2="33"/></g><rect x="23.2" y="6" width="1.6" height="4" fill="#16385b"/><circle cx="24" cy="6" r="1.6" fill="#c9962a"/></svg>',
+  27: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><rect x="10" y="21" width="28" height="18" rx="1.5" fill="#1e4b79"/><rect x="18" y="19" width="12" height="3" rx="1" fill="#16385b"/><g transform="rotate(-12 24 14)"><rect x="18" y="6" width="12" height="12" fill="#fff" stroke="#16385b" stroke-width="1.2"/><path d="M21 12 l2 2 4-4" fill="none" stroke="#1e6b34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g></svg>',
+  52: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><rect x="6" y="12" width="36" height="24" fill="#fff" stroke="#16385b" stroke-width="1"/><g fill="#9d2f2f"><rect x="6" y="12" width="36" height="3.43"/><rect x="6" y="18.86" width="36" height="3.43"/><rect x="6" y="25.71" width="36" height="3.43"/><rect x="6" y="32.57" width="36" height="3.43"/></g><rect x="6" y="12" width="16" height="13.7" fill="#1e4b79"/><g fill="#fff"><circle cx="10" cy="15.5" r="1"/><circle cx="14" cy="15.5" r="1"/><circle cx="18" cy="15.5" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="16" cy="19" r="1"/><circle cx="10" cy="22.5" r="1"/><circle cx="14" cy="22.5" r="1"/><circle cx="18" cy="22.5" r="1"/></g></svg>',
+  58: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><path d="M10 32 h28 l-3.5 7 h-21 z" fill="#7a5900"/><line x1="24" y1="10" x2="24" y2="32" stroke="#16385b" stroke-width="1.6"/><path d="M24 11 L36 30 L24 30 Z" fill="#fff" stroke="#16385b" stroke-width="1.1"/><path d="M24 14 L14 30 L24 30 Z" fill="#eef0f2" stroke="#16385b" stroke-width="1.1"/><path d="M6 41 q6 -3 12 0 t12 0 t12 0" fill="none" stroke="#1e4b79" stroke-width="1.6"/></svg>',
+  62: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><path d="M36 9 C 22 12, 15 24, 12 37 C 25 34, 34 24, 39 12 Z" fill="#1e4b79"/><path d="M34 13 C 26 18, 20 26, 15 34" fill="none" stroke="#fff" stroke-width="1.3"/><path d="M12 37 l-3 3 M12 37 l4 .6 -1-3.6 z" fill="#16385b" stroke="#16385b" stroke-width="1.4" stroke-linecap="round"/></svg>',
+  92: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><path fill="#9d2f2f" d="M24 6 l2.2 6.3 5-3.4 -1.2 5.6 6-.6 -3.4 4.2 5.4 2.4 -4.8 2 3 4.6 -6-1 .8 5.4 -4.2-3.2 -2.6 4.6 -2.6-4.6 -4.2 3.2 .8-5.4 -6 1 3-4.6 -4.8-2 5.4-2.4 -3.4-4.2 6 .6 -1.2-5.6 5 3.4z"/><rect x="23.2" y="34" width="1.6" height="7" fill="#9d2f2f"/></svg>',
+  95: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><g fill="#3a8a6a"><path d="M18 39 L30 39 L27.5 20 L20.5 20 Z"/><circle cx="24" cy="15.5" r="3.4"/><path d="M24 8.5 l1 3.2 h-2 z M20.6 9.6 l1.4 2.8 -2.1 .5 z M27.4 9.6 l-1.4 2.8 2.1 .5 z M17.8 12 l2.1 2 -2.4 1 z M30.2 12 l-2.1 2 2.4 1 z"/><path d="M25.5 18 L32.5 9.5" stroke="#3a8a6a" stroke-width="2.4" fill="none" stroke-linecap="round"/><rect x="15" y="39" width="18" height="3.5"/></g><path d="M33 10 q1.5 -3 3 0 q-1.5 1.5 -3 0z" fill="#c9962a"/></svg>',
+  97: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><path d="M24 6 l4.6 9.3 10.3 1.5 -7.4 7.3 1.7 10.2 -9.2-4.8 -9.2 4.8 1.7-10.2 -7.4-7.3 10.3-1.5z" fill="#1e4b79"/></svg>',
+  99: '<svg class="answer-art" aria-hidden="true" focusable="false" viewBox="0 0 48 48"><g stroke="#9d2f2f" stroke-width="1.8" stroke-linecap="round"><line x1="24" y1="24" x2="24" y2="9"/><line x1="24" y1="24" x2="24" y2="39"/><line x1="24" y1="24" x2="9" y2="24"/><line x1="24" y1="24" x2="39" y2="24"/><line x1="24" y1="24" x2="13.4" y2="13.4"/><line x1="24" y1="24" x2="34.6" y2="34.6"/><line x1="24" y1="24" x2="34.6" y2="13.4"/><line x1="24" y1="24" x2="13.4" y2="34.6"/></g><g fill="#c9962a"><circle cx="24" cy="8" r="1.6"/><circle cx="24" cy="40" r="1.6"/><circle cx="8" cy="24" r="1.6"/><circle cx="40" cy="24" r="1.6"/><circle cx="12.6" cy="12.6" r="1.6"/><circle cx="35.4" cy="35.4" r="1.6"/><circle cx="35.4" cy="12.6" r="1.6"/><circle cx="12.6" cy="35.4" r="1.6"/></g><circle cx="24" cy="24" r="2.4" fill="#1e4b79"/></svg>'
+};
+ANSWER_ART[5] = ANSWER_ART[1];    // Bill of Rights — same scroll as the Constitution
+ANSWER_ART[94] = ANSWER_ART[13];  // U.S. capital — same Capitol dome as the branches
+ANSWER_ART[96] = ANSWER_ART[52];  // 50 stars on the flag — same flag
+ANSWER_ART[73] = ANSWER_ART[72];  // Civil War — same crossed swords as "name a war"
+ANSWER_ART[78] = ANSWER_ART[72];  // a 1900s war — same crossed swords
+// Upgrade emoji → the nicer inline SVG where one theme already has good art:
+ANSWER_ART[12] = ANSWER_ART[14] = ANSWER_ART[37] = ANSWER_ART[40] = ANSWER_ART[38]; // law/justice → scales
+ANSWER_ART[48] = ANSWER_ART[49] = ANSWER_ART[50] = ANSWER_ART[54] = ANSWER_ART[27]; // voting → ballot box
+ANSWER_ART[66] = ANSWER_ART[1];   // when the Constitution was written — same scroll
+// The illustration for a question (raw SVG), or "" if it only has the emoji hook.
+function answerArt(id) { return ANSWER_ART[id] || ""; }
+
+// Per-ANSWER emoji for a few list questions where each item has an obvious icon — a
+// decorative hook on the individual accepted answers (aria-hidden; the text still
+// teaches). Keyed by the exact accepted-answer string.
+const ANSWER_ITEM_EMOJI = {
+  6:  { speech: "🗣️", religion: "🙏", assembly: "🤝", press: "📰", "petition the government": "✍️" },
+  9:  { life: "❤️", liberty: "🕊️", "pursuit of happiness": "😊" },
+  51: { "freedom of expression": "🗣️", "freedom of speech": "🗣️", "freedom of assembly": "🤝",
+        "freedom to petition the government": "✍️", "freedom of religion": "🙏", "the right to bear arms": "🛡️" },
+  100:{ "New Year’s Day": "🎉", "Martin Luther King, Jr. Day": "✊", "Presidents’ Day": "🎩",
+        "Memorial Day": "🎖️", "Juneteenth": "🕊️", "Independence Day": "🎆", "Labor Day": "🛠️",
+        "Columbus Day": "🧭", "Veterans Day": "🎗️", "Thanksgiving": "🦃", "Christmas": "🎄" }
+};
+function itemEmoji(qid, ans) { const m = ANSWER_ITEM_EMOJI[qid]; return (m && m[ans]) || ""; }
+
+const ALL_QUESTIONS = [
+  {id:1,category:"Government",q:"What is the supreme law of the land?",a:["the Constitution"],star:false,dynamic:false},
+  {id:2,category:"Government",q:"What does the Constitution do?",a:["sets up the government","defines the government","protects basic rights of Americans"],star:false,dynamic:false},
+  {id:3,category:"Government",q:"The idea of self-government is in the first three words of the Constitution. What are these words?",a:["We the People"],star:false,dynamic:false},
+  {id:4,category:"Government",q:"What is an amendment?",a:["a change (to the Constitution)","an addition (to the Constitution)"],star:false,dynamic:false},
+  {id:5,category:"Government",q:"What do we call the first ten amendments to the Constitution?",a:["the Bill of Rights"],star:false,dynamic:false},
+  {id:6,category:"Government",q:"What is one right or freedom from the First Amendment?",a:["speech","religion","assembly","press","petition the government"],star:true,dynamic:false},
+  {id:7,category:"Government",q:"How many amendments does the Constitution have?",a:["twenty-seven (27)"],star:false,dynamic:false},
+  {id:8,category:"Government",q:"What did the Declaration of Independence do?",a:["announced our independence (from Great Britain)","declared our independence (from Great Britain)","said that the United States is free (from Great Britain)"],star:false,dynamic:false},
+  {id:9,category:"Government",q:"What are two rights in the Declaration of Independence?",a:["life","liberty","pursuit of happiness"],need:2,star:false,dynamic:false},
+  {id:10,category:"Government",q:"What is freedom of religion?",a:["You can practice any religion, or not practice a religion."],star:false,dynamic:false},
+  {id:11,category:"Government",q:"What is the economic system in the United States?",a:["capitalist economy","market economy"],star:true,dynamic:false},
+  {id:12,category:"Government",q:"What is the “rule of law”?",a:["Everyone must follow the law.","Leaders must obey the law.","Government must obey the law.","No one is above the law."],star:false,dynamic:false},
+  {id:13,category:"Government",q:"Name one branch or part of the government.",a:["Congress","legislative","President","executive","the courts","judicial"],star:true,dynamic:false},
+  {id:14,category:"Government",q:"What stops one branch of government from becoming too powerful?",a:["checks and balances","separation of powers"],star:false,dynamic:false},
+  {id:15,category:"Government",q:"Who is in charge of the executive branch?",a:["the President"],star:false,dynamic:false},
+  {id:16,category:"Government",q:"Who makes federal laws?",a:["Congress","Senate and House (of Representatives)","(U.S. or national) legislature"],star:false,dynamic:false},
+  {id:17,category:"Government",q:"What are the two parts of the U.S. Congress?",a:["Senate","House (of Representatives)"],need:2,star:true,dynamic:false},
+  {id:18,category:"Government",q:"How many U.S. Senators are there?",a:["one hundred (100)"],star:false,dynamic:false},
+  {id:19,category:"Government",q:"We elect a U.S. Senator for how many years?",a:["six (6)"],star:false,dynamic:false},
+  {id:20,category:"Government",q:"Who is one of your state’s U.S. Senators now?",a:["John Cornyn","Ted Cruz"],star:true,dynamic:true,note:"These are the two U.S. Senators for Texas. (Answers vary by state.) May change on January 3, 2027 — the date the new Senate term begins (U.S. Constitution, 20th Amendment). Cornyn lost his May 2026 primary and won't be the nominee in the Nov 3, 2026 general election (Paxton vs. Talarico), so his seat is the one expected to change hands then. Re-check this answer if the interview is on or after Jan 3, 2027."},
+  {id:21,category:"Government",q:"The House of Representatives has how many voting members?",a:["four hundred thirty-five (435)"],star:false,dynamic:false},
+  {id:22,category:"Government",q:"We elect a U.S. Representative for how many years?",a:["two (2)"],star:false,dynamic:false},
+  {id:23,category:"Government",q:"Name your U.S. Representative.",a:["Greg Casar"],star:false,dynamic:true,note:"Confirmed at house.gov/representatives/find-your-representative: your home address is in Texas's 35th Congressional District, represented by Greg Casar. Manor itself is split between Districts 10 and 35 — this is the answer for your specific address, not all of Manor. May change on January 3, 2027 — the date the new House term begins (U.S. Constitution, 20th Amendment) — since Texas's redistricting and this year's elections both take effect with that term. Re-check this answer if the interview is on or after Jan 3, 2027."},
+  {id:24,category:"Government",q:"Who does a U.S. Senator represent?",a:["all people of the state"],star:false,dynamic:false},
+  {id:25,category:"Government",q:"Why do some states have more Representatives than other states?",a:["(because of) the state’s population","(because) they have more people","(because) some states have more people"],star:false,dynamic:false},
+  {id:26,category:"Government",q:"We elect a President for how many years?",a:["four (4)"],star:false,dynamic:false},
+  {id:27,category:"Government",q:"In what month do we vote for President?",a:["November"],star:true,dynamic:false},
+  {id:28,category:"Government",q:"What is the name of the President of the United States now?",a:["Donald J. Trump","Donald Trump","Trump"],star:true,dynamic:true,note:"Stable through the end of the current term, January 20, 2029 (U.S. Constitution, 20th Amendment) — the only scheduled date this could change. Re-check this answer if the interview is on or after that date."},
+  {id:29,category:"Government",q:"What is the name of the Vice President of the United States now?",a:["JD Vance","Vance"],star:false,dynamic:true,note:"Stable through the end of the current term, January 20, 2029 (U.S. Constitution, 20th Amendment) — the only scheduled date this could change. Re-check this answer if the interview is on or after that date."},
+  {id:30,category:"Government",q:"If the President can no longer serve, who becomes President?",a:["the Vice President"],star:false,dynamic:false},
+  {id:31,category:"Government",q:"If both the President and the Vice President can no longer serve, who becomes President?",a:["the Speaker of the House"],star:false,dynamic:false},
+  {id:32,category:"Government",q:"Who is the Commander in Chief of the military?",a:["the President"],star:false,dynamic:false},
+  {id:33,category:"Government",q:"Who signs bills to become laws?",a:["the President"],star:false,dynamic:false},
+  {id:34,category:"Government",q:"Who vetoes bills?",a:["the President"],star:false,dynamic:false},
+  {id:35,category:"Government",q:"What does the President’s Cabinet do?",a:["advises the President"],star:false,dynamic:false},
+  {id:36,category:"Government",q:"What are two Cabinet-level positions?",a:["Secretary of Agriculture","Secretary of Commerce","Secretary of Defense","Secretary of Education","Secretary of Energy","Secretary of Health and Human Services","Secretary of Homeland Security","Secretary of Housing and Urban Development","Secretary of the Interior","Secretary of Labor","Secretary of State","Secretary of Transportation","Secretary of the Treasury","Secretary of Veterans Affairs","Attorney General","Vice President"],need:2,star:false,dynamic:false},
+  {id:37,category:"Government",q:"What does the judicial branch do?",a:["reviews laws","explains laws","resolves disputes (disagreements)","decides if a law goes against the Constitution"],star:false,dynamic:false},
+  {id:38,category:"Government",q:"What is the highest court in the United States?",a:["the Supreme Court"],star:false,dynamic:false},
+  {id:39,category:"Government",q:"How many justices are on the Supreme Court?",a:["nine (9)"],star:false,dynamic:true,note:"No scheduled change date. The number nine is set by federal statute (last changed by the Judiciary Act of 1869) and would only change if Congress passed a new law — nothing pending. Re-check only if you hear news of such a law."},
+  {id:40,category:"Government",q:"Who is the Chief Justice of the United States now?",a:["John Roberts","John G. Roberts, Jr."],star:false,dynamic:true,note:"No scheduled change date. Supreme Court justices serve for life, so this only changes on a retirement, death, or resignation — none scheduled. Re-check only if you hear news of one."},
+  {id:41,category:"Government",q:"Under our Constitution, some powers belong to the federal government. What is one power of the federal government?",a:["to print money","to declare war","to create an army","to make treaties"],star:false,dynamic:false},
+  {id:42,category:"Government",q:"Under our Constitution, some powers belong to the states. What is one power of the states?",a:["provide schooling and education","provide protection (police)","provide safety (fire departments)","give a driver’s license","approve zoning and land use"],star:false,dynamic:false},
+  {id:43,category:"Government",q:"Who is the Governor of your state now?",a:["Greg Abbott"],star:false,dynamic:true,note:"Governor of Texas. (Answers vary by state.) His current term runs through January 2027; Texas governors are traditionally sworn in in mid-January (the exact 2027 date isn't set yet). He is running for a fourth term in the Nov 3, 2026 election — if he wins, this answer doesn't change even after the swearing-in. Re-check this answer in January 2027 either way."},
+  {id:44,category:"Government",q:"What is the capital of your state?",a:["Austin"],star:true,dynamic:false,note:"Capital of Texas. (Answers vary by state.)"},
+  {id:45,category:"Government",q:"What are the two major political parties in the United States?",a:["Democratic and Republican"],star:true,dynamic:false},
+  {id:46,category:"Government",q:"What is the political party of the President now?",a:["Republican (Party)"],star:false,dynamic:true,note:"Tied to Q28 — stable through the end of the current presidential term, January 20, 2029 (U.S. Constitution, 20th Amendment). Re-check this answer if the interview is on or after that date."},
+  {id:47,category:"Government",q:"What is the name of the Speaker of the House of Representatives now?",a:["Mike Johnson","Johnson","James Michael Johnson"],star:false,dynamic:true,note:"No fixed change date — the Speaker can be replaced at any time by a House vote (it happened in October 2023), so re-check close to the interview no matter the date. The one scheduled checkpoint to watch is January 3, 2027, when the new Congress convenes — if House control flips in the Nov 3, 2026 midterms, the Speaker would change then."},
+  {id:48,category:"Government",q:"There are four amendments to the Constitution about who can vote. Describe one of them.",a:["Citizens eighteen (18) and older (can vote).","You don’t have to pay (a poll tax) to vote.","Any citizen can vote. (Women and men can vote.)","A male citizen of any race (can vote)."],star:false,dynamic:false},
+  {id:49,category:"Government",q:"What is one responsibility that is only for United States citizens?",a:["serve on a jury","vote in a federal election"],star:true,dynamic:false},
+  {id:50,category:"Government",q:"Name one right only for United States citizens.",a:["vote in a federal election","run for federal office"],star:false,dynamic:false},
+  {id:51,category:"Government",q:"What are two rights of everyone living in the United States?",a:["freedom of expression","freedom of speech","freedom of assembly","freedom to petition the government","freedom of religion","the right to bear arms"],need:2,star:false,dynamic:false},
+  {id:52,category:"Government",q:"What do we show loyalty to when we say the Pledge of Allegiance?",a:["the United States","the flag"],star:false,dynamic:false},
+  {id:53,category:"Government",q:"What is one promise you make when you become a United States citizen?",a:["give up loyalty to other countries","defend the Constitution and laws of the United States","obey the laws of the United States","serve in the U.S. military (if needed)","serve (do important work for) the nation (if needed)","be loyal to the United States"],star:false,dynamic:false},
+  {id:54,category:"Government",q:"How old do citizens have to be to vote for President?",a:["eighteen (18) and older"],star:true,dynamic:false},
+  {id:55,category:"Government",q:"What are two ways that Americans can participate in their democracy?",a:["vote","join a political party","help with a campaign","join a civic group","join a community group","give an elected official your opinion on an issue","call Senators and Representatives","publicly support or oppose an issue or policy","run for office","write to a newspaper"],need:2,star:false,dynamic:false},
+  {id:56,category:"Government",q:"When is the last day you can send in federal income tax forms?",a:["April 15"],star:true,dynamic:false},
+  {id:57,category:"Government",q:"When must all men register for the Selective Service?",a:["at age eighteen (18)","between eighteen (18) and twenty-six (26)"],star:false,dynamic:false},
+  {id:58,category:"History",q:"What is one reason colonists came to America?",a:["freedom","political liberty","religious freedom","economic opportunity","practice their religion","escape persecution"],star:false,dynamic:false},
+  {id:59,category:"History",q:"Who lived in America before the Europeans arrived?",a:["American Indians","Native Americans"],star:false,dynamic:false},
+  {id:60,category:"History",q:"What group of people was taken to America and sold as slaves?",a:["Africans","people from Africa"],star:false,dynamic:false},
+  {id:61,category:"History",q:"Why did the colonists fight the British?",a:["because of high taxes (taxation without representation)","because the British army stayed in their houses (boarding, quartering)","because they didn’t have self-government"],star:false,dynamic:false},
+  {id:62,category:"History",q:"Who wrote the Declaration of Independence?",a:["(Thomas) Jefferson"],star:false,dynamic:false},
+  {id:63,category:"History",q:"When was the Declaration of Independence adopted?",a:["July 4, 1776"],star:false,dynamic:false},
+  {id:64,category:"History",q:"There were 13 original states. Name three.",a:["New Hampshire","Massachusetts","Rhode Island","Connecticut","New York","New Jersey","Pennsylvania","Delaware","Maryland","Virginia","North Carolina","South Carolina","Georgia"],need:3,star:false,dynamic:false},
+  {id:65,category:"History",q:"What happened at the Constitutional Convention?",a:["The Constitution was written.","The Founding Fathers wrote the Constitution."],star:false,dynamic:false},
+  {id:66,category:"History",q:"When was the Constitution written?",a:["1787"],star:false,dynamic:false},
+  {id:67,category:"History",q:"The Federalist Papers supported the passage of the U.S. Constitution. Name one of the writers.",a:["(James) Madison","(Alexander) Hamilton","(John) Jay","Publius"],star:false,dynamic:false},
+  {id:68,category:"History",q:"What is one thing Benjamin Franklin is famous for?",a:["U.S. diplomat","oldest member of the Constitutional Convention","first Postmaster General of the United States","writer of “Poor Richard’s Almanac”","started the first free libraries"],star:false,dynamic:false},
+  {id:69,category:"History",q:"Who is the “Father of Our Country”?",a:["(George) Washington"],star:false,dynamic:false},
+  {id:70,category:"History",q:"Who was the first President?",a:["(George) Washington"],star:true,dynamic:false},
+  {id:71,category:"History",q:"What territory did the United States buy from France in 1803?",a:["the Louisiana Territory","Louisiana"],star:false,dynamic:false},
+  {id:72,category:"History",q:"Name one war fought by the United States in the 1800s.",a:["War of 1812","Mexican-American War","Civil War","Spanish-American War"],star:false,dynamic:false},
+  {id:73,category:"History",q:"Name the U.S. war between the North and the South.",a:["the Civil War","the War between the States"],star:false,dynamic:false},
+  {id:74,category:"History",q:"Name one problem that led to the Civil War.",a:["slavery","economic reasons","states’ rights"],star:false,dynamic:false},
+  {id:75,category:"History",q:"What was one important thing that Abraham Lincoln did?",a:["freed the slaves (Emancipation Proclamation)","saved (or preserved) the Union","led the United States during the Civil War"],star:true,dynamic:false},
+  {id:76,category:"History",q:"What did the Emancipation Proclamation do?",a:["freed the slaves","freed slaves in the Confederacy","freed slaves in the Confederate states","freed slaves in most Southern states"],star:false,dynamic:false},
+  {id:77,category:"History",q:"What did Susan B. Anthony do?",a:["fought for women’s rights","fought for civil rights"],star:false,dynamic:false},
+  {id:78,category:"History",q:"Name one war fought by the United States in the 1900s.",a:["World War I","World War II","Korean War","Vietnam War","(Persian) Gulf War"],star:true,dynamic:false},
+  {id:79,category:"History",q:"Who was President during World War I?",a:["(Woodrow) Wilson"],star:false,dynamic:false},
+  {id:80,category:"History",q:"Who was President during the Great Depression and World War II?",a:["(Franklin) Roosevelt"],star:false,dynamic:false},
+  {id:81,category:"History",q:"Who did the United States fight in World War II?",a:["Japan, Germany, and Italy"],star:false,dynamic:false},
+  {id:82,category:"History",q:"Before he was President, Eisenhower was a general. What war was he in?",a:["World War II"],star:false,dynamic:false},
+  {id:83,category:"History",q:"During the Cold War, what was the main concern of the United States?",a:["Communism"],star:false,dynamic:false},
+  {id:84,category:"History",q:"What movement tried to end racial discrimination?",a:["civil rights (movement)"],star:false,dynamic:false},
+  {id:85,category:"History",q:"What did Martin Luther King, Jr. do?",a:["fought for civil rights","worked for equality for all Americans"],star:true,dynamic:false},
+  {id:86,category:"History",q:"What major event happened on September 11, 2001, in the United States?",a:["Terrorists attacked the United States."],star:false,dynamic:false},
+  {id:87,category:"History",q:"Name one American Indian tribe in the United States.",a:["Cherokee","Navajo","Sioux","Chippewa","Choctaw","Pueblo","Apache","Iroquois","Creek","Blackfeet","Seminole","Cheyenne","Arawak","Shawnee","Mohegan","Huron","Oneida","Lakota","Crow","Teton","Hopi","Inuit"],star:false,dynamic:false,note:"USCIS officers are supplied with a list of all federally recognized tribes; these are the examples on the official study list."},
+  {id:88,category:"Civics",q:"Name one of the two longest rivers in the United States.",a:["Missouri (River)","Mississippi (River)"],star:false,dynamic:false},
+  {id:89,category:"Civics",q:"What ocean is on the West Coast of the United States?",a:["Pacific (Ocean)"],star:false,dynamic:false},
+  {id:90,category:"Civics",q:"What ocean is on the East Coast of the United States?",a:["Atlantic (Ocean)"],star:false,dynamic:false},
+  {id:91,category:"Civics",q:"Name one U.S. territory.",a:["Puerto Rico","U.S. Virgin Islands","American Samoa","Northern Mariana Islands","Guam"],star:false,dynamic:false},
+  {id:92,category:"Civics",q:"Name one state that borders Canada.",a:["Maine","New Hampshire","Vermont","New York","Pennsylvania","Ohio","Michigan","Minnesota","North Dakota","Montana","Idaho","Washington","Alaska"],star:false,dynamic:false},
+  {id:93,category:"Civics",q:"Name one state that borders Mexico.",a:["California","Arizona","New Mexico","Texas"],star:false,dynamic:false},
+  {id:94,category:"Civics",q:"What is the capital of the United States?",a:["Washington, D.C."],star:true,dynamic:false},
+  {id:95,category:"Civics",q:"Where is the Statue of Liberty?",a:["New York (Harbor)","Liberty Island","New Jersey","near New York City","on the Hudson (River)"],star:true,dynamic:false},
+  {id:96,category:"Civics",q:"Why does the flag have 13 stripes?",a:["because there were 13 original colonies","because the stripes represent the original colonies"],star:false,dynamic:false},
+  {id:97,category:"Civics",q:"Why does the flag have 50 stars?",a:["because there is one star for each state","because each star represents a state","because there are 50 states"],star:true,dynamic:false},
+  {id:98,category:"Civics",q:"What is the name of the national anthem?",a:["The Star-Spangled Banner"],star:false,dynamic:false},
+  {id:99,category:"Civics",q:"When do we celebrate Independence Day?",a:["July 4"],star:true,dynamic:false},
+  {id:100,category:"Civics",q:"Name two national U.S. holidays.",a:["New Year’s Day","Martin Luther King, Jr. Day","Presidents’ Day","Memorial Day","Juneteenth","Independence Day","Labor Day","Columbus Day","Veterans Day","Thanksgiving","Christmas"],need:2,star:false,dynamic:false}
+];
+
+// The 9 "may change" officeholder questions (dynamic:true) are time-sensitive.
+// Re-verified July 16, 2026 (see SOURCES.md); unhidden. Flip HIDE_DYNAMIC back to
+// true only if a fresh check finds a stale answer you haven't had time to fix yet.
+const HIDE_DYNAMIC = false;
+const QUESTIONS = ALL_QUESTIONS.filter(q => !(HIDE_DYNAMIC && q.dynamic));
+
+// Bengali (বাংলা) translations of every question and its answers, shown on
+// demand in Browse (see renderBrowse). Machine/AI-assisted — a study aid, not
+// official; `bnNote` carries any per-item translation caveat.
+const BN_TRANSLATIONS = {"1":{"q":"দেশের সর্বোচ্চ আইন কোনটি?","a":["সংবিধান"],"note":""},"2":{"q":"সংবিধান কী করে?","a":["সরকার গঠন করে","সরকারের সংজ্ঞা নির্ধারণ করে","আমেরিকানদের মৌলিক অধিকার রক্ষা করে"],"note":""},"3":{"q":"স্ব-শাসনের ধারণাটি সংবিধানের প্রথম তিনটি শব্দে রয়েছে। শব্দগুলো কী?","a":["We the People"],"note":"Answer kept in English because at the interview she must recite the exact constitutional phrase 'We the People' in English."},"4":{"q":"সংশোধনী কী?","a":["একটি পরিবর্তন (সংবিধানে)","একটি সংযোজন (সংবিধানে)"],"note":""},"5":{"q":"সংবিধানের প্রথম দশটি সংশোধনীকে আমরা কী বলি?","a":["বিল অব রাইটস"],"note":""},"6":{"q":"প্রথম সংশোধনী থেকে একটি অধিকার বা স্বাধীনতা কী?","a":["বাক্‌স্বাধীনতা","ধর্ম","সমাবেশ","সংবাদপত্র","সরকারের কাছে আবেদন করা"],"note":""},"7":{"q":"সংবিধানে কতগুলো সংশোধনী রয়েছে?","a":["সাতাশ (27)"],"note":""},"8":{"q":"স্বাধীনতার ঘোষণাপত্র কী করেছিল?","a":["আমাদের স্বাধীনতা ঘোষণা দিয়েছিল (গ্রেট ব্রিটেন থেকে)","আমাদের স্বাধীনতা ঘোষণা করেছিল (গ্রেট ব্রিটেন থেকে)","বলেছিল যে যুক্তরাষ্ট্র স্বাধীন (গ্রেট ব্রিটেন থেকে)"],"note":"English 'announced' and 'declared' are near-synonyms in Bengali; rendered as ঘোষণা দিয়েছিল vs ঘোষণা করেছিল to keep them distinct."},"9":{"q":"স্বাধীনতার ঘোষণাপত্রে দুটি অধিকার কী কী?","a":["জীবন","স্বাধীনতা","সুখের অন্বেষণ"],"note":""},"10":{"q":"ধর্মের স্বাধীনতা কী?","a":["আপনি যেকোনো ধর্ম পালন করতে পারেন, অথবা কোনো ধর্ম পালন নাও করতে পারেন।"],"note":""},"11":{"q":"যুক্তরাষ্ট্রের অর্থনৈতিক ব্যবস্থা কী?","a":["পুঁজিবাদী অর্থনীতি","বাজার অর্থনীতি"],"note":""},"12":{"q":"\"আইনের শাসন\" কী?","a":["সবাইকে আইন মানতে হবে।","নেতাদের আইন মানতে হবে।","সরকারকে আইন মানতে হবে।","কেউ আইনের ঊর্ধ্বে নয়।"],"note":""},"13":{"q":"সরকারের একটি শাখা বা অংশের নাম বলুন।","a":["কংগ্রেস","আইনসভা","প্রেসিডেন্ট","নির্বাহী","আদালত","বিচার বিভাগ"],"note":""},"14":{"q":"কী সরকারের একটি শাখাকে অত্যধিক ক্ষমতাশালী হওয়া থেকে বিরত রাখে?","a":["নিয়ন্ত্রণ ও ভারসাম্য","ক্ষমতার পৃথকীকরণ"],"note":""},"15":{"q":"নির্বাহী শাখার দায়িত্বে কে থাকেন?","a":["প্রেসিডেন্ট"],"note":""},"16":{"q":"ফেডারেল আইন কে তৈরি করে?","a":["কংগ্রেস","সিনেট ও প্রতিনিধি পরিষদ","(যুক্তরাষ্ট্র বা জাতীয়) আইনসভা"],"note":""},"17":{"q":"যুক্তরাষ্ট্রের কংগ্রেসের দুটি অংশ কী কী?","a":["সিনেট","প্রতিনিধি পরিষদ"],"note":""},"18":{"q":"যুক্তরাষ্ট্রে কতজন সিনেটর আছেন?","a":["একশত (100)"],"note":""},"19":{"q":"আমরা একজন সিনেটরকে কত বছরের জন্য নির্বাচিত করি?","a":["ছয় (6)"],"note":""},"20":{"q":"এই মুহূর্তে আপনার অঙ্গরাজ্যের একজন সিনেটর কে?","a":["John Cornyn","Ted Cruz"],"note":"Proper names kept in English per instructions."},"21":{"q":"হাউস অফ রিপ্রেজেন্টেটিভস-এ কতজন ভোটদানকারী সদস্য আছে?","a":["চারশ পঁয়ত্রিশ (435)"],"note":""},"22":{"q":"আমরা একজন U.S. রিপ্রেজেন্টেটিভকে কত বছরের জন্য নির্বাচন করি?","a":["দুই (2)"],"note":""},"23":{"q":"আপনার U.S. রিপ্রেজেন্টেটিভের নাম বলুন।","a":["Greg Casar"],"note":""},"24":{"q":"একজন U.S. সেনেটর কাদের প্রতিনিধিত্ব করেন?","a":["অঙ্গরাজ্যের সকল মানুষ"],"note":""},"25":{"q":"কেন কিছু অঙ্গরাজ্যের অন্যান্য অঙ্গরাজ্যের চেয়ে বেশি রিপ্রেজেন্টেটিভ থাকে?","a":["(কারণ) অঙ্গরাজ্যের জনসংখ্যা","(কারণ) সেখানে বেশি মানুষ আছে","(কারণ) কিছু অঙ্গরাজ্যে বেশি মানুষ আছে"],"note":""},"26":{"q":"আমরা একজন প্রেসিডেন্টকে কত বছরের জন্য নির্বাচন করি?","a":["চার (4)"],"note":""},"27":{"q":"আমরা কোন মাসে প্রেসিডেন্টের জন্য ভোট দিই?","a":["নভেম্বর"],"note":""},"28":{"q":"এখন যুক্তরাষ্ট্রের প্রেসিডেন্টের নাম কী?","a":["Donald J. Trump","Donald Trump","Trump"],"note":""},"29":{"q":"এখন যুক্তরাষ্ট্রের ভাইস প্রেসিডেন্টের নাম কী?","a":["JD Vance","Vance"],"note":""},"30":{"q":"যদি প্রেসিডেন্ট আর দায়িত্ব পালন করতে না পারেন, তাহলে কে প্রেসিডেন্ট হন?","a":["ভাইস প্রেসিডেন্ট"],"note":""},"31":{"q":"যদি প্রেসিডেন্ট এবং ভাইস প্রেসিডেন্ট দুজনেই আর দায়িত্ব পালন করতে না পারেন, তাহলে কে প্রেসিডেন্ট হন?","a":["হাউসের স্পিকার"],"note":""},"32":{"q":"সামরিক বাহিনীর প্রধান সেনাপতি কে?","a":["প্রেসিডেন্ট"],"note":""},"33":{"q":"কে বিলে স্বাক্ষর করে আইনে পরিণত করেন?","a":["প্রেসিডেন্ট"],"note":""},"34":{"q":"কে বিলে ভেটো দেন?","a":["প্রেসিডেন্ট"],"note":""},"35":{"q":"প্রেসিডেন্টের মন্ত্রিসভা কী করে?","a":["প্রেসিডেন্টকে পরামর্শ দেয়"],"note":""},"36":{"q":"মন্ত্রিসভা-স্তরের দুটি পদ কী কী?","a":["কৃষি সচিব (Secretary of Agriculture)","বাণিজ্য সচিব (Secretary of Commerce)","প্রতিরক্ষা সচিব (Secretary of Defense)","শিক্ষা সচিব (Secretary of Education)","জ্বালানি সচিব (Secretary of Energy)","স্বাস্থ্য ও মানবসেবা সচিব (Secretary of Health and Human Services)","হোমল্যান্ড সিকিউরিটি সচিব (Secretary of Homeland Security)","গৃহায়ন ও নগর উন্নয়ন সচিব (Secretary of Housing and Urban Development)","অভ্যন্তরীণ বিষয়ক সচিব (Secretary of the Interior)","শ্রম সচিব (Secretary of Labor)","পররাষ্ট্র সচিব (Secretary of State)","পরিবহন সচিব (Secretary of Transportation)","অর্থ সচিব (Secretary of the Treasury)","প্রাক্তন সৈনিক বিষয়ক সচিব (Secretary of Veterans Affairs)","অ্যাটর্নি জেনারেল (Attorney General)","ভাইস প্রেসিডেন্ট"],"note":"US Secretary of the Interior manages federal lands/natural resources, not internal affairs; Secretary of State = foreign minister. English titles kept in parentheses since those are what she recognizes on the official list."},"37":{"q":"বিচার বিভাগ কী করে?","a":["আইন পর্যালোচনা করে","আইন ব্যাখ্যা করে","বিরোধ (মতভেদ) নিষ্পত্তি করে","কোনো আইন সংবিধানের বিরুদ্ধে যায় কিনা তা সিদ্ধান্ত নেয়"],"note":""},"38":{"q":"যুক্তরাষ্ট্রের সর্বোচ্চ আদালত কোনটি?","a":["সুপ্রিম কোর্ট"],"note":""},"39":{"q":"সুপ্রিম কোর্টে কতজন বিচারপতি আছেন?","a":["নয় (9)"],"note":""},"40":{"q":"এখন যুক্তরাষ্ট্রের প্রধান বিচারপতি কে?","a":["John Roberts","John G. Roberts, Jr."],"note":""},"41":{"q":"আমাদের সংবিধান অনুযায়ী, কিছু ক্ষমতা কেন্দ্রীয় সরকারের অধীনে। কেন্দ্রীয় সরকারের একটি ক্ষমতা কী?","a":["টাকা ছাপানো","যুদ্ধ ঘোষণা করা","সেনাবাহিনী গঠন করা","চুক্তি করা"],"note":""},"42":{"q":"আমাদের সংবিধান অনুযায়ী, কিছু ক্ষমতা অঙ্গরাজ্যগুলোর অধীনে। অঙ্গরাজ্যের একটি ক্ষমতা কী?","a":["স্কুল ও শিক্ষার ব্যবস্থা করা","সুরক্ষার ব্যবস্থা করা (পুলিশ)","নিরাপত্তার ব্যবস্থা করা (দমকল বিভাগ)","ড্রাইভিং লাইসেন্স দেওয়া","জোনিং ও ভূমি ব্যবহার অনুমোদন করা"],"note":""},"43":{"q":"এখন আপনার অঙ্গরাজ্যের গভর্নর কে?","a":["Greg Abbott"],"note":""},"44":{"q":"আপনার অঙ্গরাজ্যের রাজধানী কী?","a":["Austin"],"note":""},"45":{"q":"যুক্তরাষ্ট্রের দুটি প্রধান রাজনৈতিক দল কী কী?","a":["ডেমোক্র্যাটিক ও রিপাবলিকান"],"note":""},"46":{"q":"এখন প্রেসিডেন্টের রাজনৈতিক দল কী?","a":["রিপাবলিকান (দল)"],"note":""},"47":{"q":"এখন প্রতিনিধি পরিষদের স্পিকারের নাম কী?","a":["Mike Johnson","Johnson","James Michael Johnson"],"note":""},"48":{"q":"কে ভোট দিতে পারবে তা নিয়ে সংবিধানে চারটি সংশোধনী আছে। তার একটি বর্ণনা করুন।","a":["আঠারো (18) বা তার বেশি বয়সের নাগরিকরা (ভোট দিতে পারবে)।","ভোট দেওয়ার জন্য আপনাকে (পোল ট্যাক্স) দিতে হবে না।","যেকোনো নাগরিক ভোট দিতে পারবে। (নারী ও পুরুষ উভয়েই ভোট দিতে পারবে।)","যেকোনো বর্ণের একজন পুরুষ নাগরিক (ভোট দিতে পারবে)।"],"note":""},"49":{"q":"শুধুমাত্র যুক্তরাষ্ট্রের নাগরিকদের জন্য একটি দায়িত্ব কী?","a":["জুরিতে দায়িত্ব পালন করা","কেন্দ্রীয় নির্বাচনে ভোট দেওয়া"],"note":""},"50":{"q":"শুধুমাত্র যুক্তরাষ্ট্রের নাগরিকদের জন্য একটি অধিকারের নাম বলুন।","a":["কেন্দ্রীয় নির্বাচনে ভোট দেওয়া","কেন্দ্রীয় পদের জন্য প্রার্থী হওয়া"],"note":""},"51":{"q":"যুক্তরাষ্ট্রে বসবাসকারী সকলের দুটি অধিকার কী কী?","a":["মত প্রকাশের স্বাধীনতা","বাক্‌স্বাধীনতা","সমাবেশের স্বাধীনতা","সরকারের কাছে আবেদন করার স্বাধীনতা","ধর্মের স্বাধীনতা","অস্ত্র বহনের অধিকার"],"note":""},"52":{"q":"আনুগত্যের অঙ্গীকার বলার সময় আমরা কার প্রতি আনুগত্য প্রকাশ করি?","a":["যুক্তরাষ্ট্র","পতাকা"],"note":""},"53":{"q":"যুক্তরাষ্ট্রের নাগরিক হওয়ার সময় আপনি যে একটি প্রতিশ্রুতি দেন তা কী?","a":["অন্য দেশের প্রতি আনুগত্য ত্যাগ করা","যুক্তরাষ্ট্রের সংবিধান ও আইন রক্ষা করা","যুক্তরাষ্ট্রের আইন মেনে চলা","প্রয়োজনে যুক্তরাষ্ট্রের সেনাবাহিনীতে দায়িত্ব পালন করা","প্রয়োজনে জাতির জন্য দায়িত্ব পালন করা (গুরুত্বপূর্ণ কাজ করা)","যুক্তরাষ্ট্রের প্রতি অনুগত থাকা"],"note":""},"54":{"q":"প্রেসিডেন্ট নির্বাচনে ভোট দিতে হলে নাগরিকদের বয়স কত হতে হবে?","a":["আঠারো (18) বা তার বেশি"],"note":""},"55":{"q":"আমেরিকানরা তাদের গণতন্ত্রে অংশগ্রহণ করতে পারে এমন দুটি উপায় কী কী?","a":["ভোট দেওয়া","একটি রাজনৈতিক দলে যোগ দেওয়া","প্রচারণায় সাহায্য করা","একটি নাগরিক গোষ্ঠীতে যোগ দেওয়া","একটি সম্প্রদায় গোষ্ঠীতে যোগ দেওয়া","কোনো বিষয়ে একজন নির্বাচিত কর্মকর্তাকে আপনার মতামত জানানো","সিনেটর ও প্রতিনিধিদের ফোন করা","প্রকাশ্যে কোনো বিষয় বা নীতির সমর্থন বা বিরোধিতা করা","পদের জন্য প্রার্থী হওয়া","সংবাদপত্রে লেখা"],"note":""},"56":{"q":"কেন্দ্রীয় আয়কর ফর্ম জমা দেওয়ার শেষ দিন কবে?","a":["এপ্রিল 15"],"note":""},"57":{"q":"সকল পুরুষকে কখন সিলেক্টিভ সার্ভিসে নিবন্ধন করতে হবে?","a":["আঠারো (18) বছর বয়সে","আঠারো (18) থেকে ছাব্বিশ (26) বছরের মধ্যে"],"note":""},"58":{"q":"উপনিবেশবাসীরা আমেরিকায় আসার একটি কারণ কী?","a":["স্বাধীনতা","রাজনৈতিক স্বাধীনতা","ধর্মীয় স্বাধীনতা","অর্থনৈতিক সুযোগ","তাদের ধর্ম পালন করা","নির্যাতন থেকে পালানো"],"note":""},"59":{"q":"ইউরোপীয়রা আসার আগে আমেরিকায় কারা বাস করত?","a":["আমেরিকান ইন্ডিয়ান","নেটিভ আমেরিকান"],"note":""},"60":{"q":"কোন জনগোষ্ঠীকে আমেরিকায় নিয়ে এসে ক্রীতদাস হিসেবে বিক্রি করা হয়েছিল?","a":["আফ্রিকান","আফ্রিকা থেকে আসা মানুষ"],"note":""},"61":{"q":"উপনিবেশবাসীরা কেন British-দের বিরুদ্ধে লড়েছিল?","a":["উচ্চ করের কারণে (প্রতিনিধিত্ব ছাড়া কর আরোপ)","কারণ British সেনাবাহিনী তাদের বাড়িতে থাকত (বোর্ডিং, সৈন্য রাখা)","কারণ তাদের স্ব-শাসন ছিল না"],"note":"'British' kept in English per the place-name rule."},"62":{"q":"স্বাধীনতার ঘোষণাপত্র কে লিখেছিলেন?","a":["(Thomas) Jefferson"],"note":""},"63":{"q":"স্বাধীনতার ঘোষণাপত্র কবে গৃহীত হয়েছিল?","a":["July 4, 1776"],"note":""},"64":{"q":"মূল ১৩টি রাজ্য ছিল। তিনটির নাম বলুন।","a":["New Hampshire","Massachusetts","Rhode Island","Connecticut","New York","New Jersey","Pennsylvania","Delaware","Maryland","Virginia","North Carolina","South Carolina","Georgia"],"note":"All 13 state names kept in English per the place-name rule."},"65":{"q":"সাংবিধানিক সম্মেলনে কী ঘটেছিল?","a":["সংবিধান লেখা হয়েছিল।","প্রতিষ্ঠাতা জনকরা সংবিধান লিখেছিলেন।"],"note":""},"66":{"q":"সংবিধান কবে লেখা হয়েছিল?","a":["1787"],"note":""},"67":{"q":"ফেডারেলিস্ট পেপারস মার্কিন সংবিধান পাস হতে সমর্থন করেছিল। একজন লেখকের নাম বলুন।","a":["(James) Madison","(Alexander) Hamilton","(John) Jay","Publius"],"note":"'Publius' kept in English — the shared pen name used by the three writers."},"68":{"q":"Benjamin Franklin কোন একটি বিষয়ের জন্য বিখ্যাত?","a":["মার্কিন কূটনীতিক","সাংবিধানিক সম্মেলনের প্রবীণতম সদস্য","যুক্তরাষ্ট্রের প্রথম পোস্টমাস্টার জেনারেল","\"Poor Richard's Almanac\"-এর লেখক","প্রথম বিনামূল্যের গ্রন্থাগার প্রতিষ্ঠা করেছিলেন"],"note":"Book title kept in English (proper title)."},"69":{"q":"\"আমাদের দেশের জনক\" কে?","a":["(George) Washington"],"note":""},"70":{"q":"প্রথম President কে ছিলেন?","a":["(George) Washington"],"note":""},"71":{"q":"১৮০৩ সালে যুক্তরাষ্ট্র France থেকে কোন অঞ্চল কিনেছিল?","a":["Louisiana অঞ্চল","Louisiana"],"note":""},"72":{"q":"১৮০০-এর দশকে যুক্তরাষ্ট্রের লড়া একটি যুদ্ধের নাম বলুন।","a":["১৮১২ সালের যুদ্ধ (War of 1812)","Mexican-American যুদ্ধ","গৃহযুদ্ধ","Spanish-American যুদ্ধ"],"note":"Place-derived war names kept in English + যুদ্ধ."},"73":{"q":"উত্তর ও দক্ষিণের মধ্যে হওয়া মার্কিন যুদ্ধের নাম বলুন।","a":["গৃহযুদ্ধ","রাজ্যগুলোর মধ্যকার যুদ্ধ"],"note":""},"74":{"q":"গৃহযুদ্ধের দিকে নিয়ে যাওয়া একটি সমস্যার নাম বলুন।","a":["দাসপ্রথা","অর্থনৈতিক কারণ","রাজ্যের অধিকার"],"note":""},"75":{"q":"Abraham Lincoln কোন একটি গুরুত্বপূর্ণ কাজ করেছিলেন?","a":["ক্রীতদাসদের মুক্ত করেছিলেন (দাসমুক্তি ঘোষণা)","ইউনিয়ন রক্ষা করেছিলেন","গৃহযুদ্ধের সময় যুক্তরাষ্ট্রকে নেতৃত্ব দিয়েছিলেন"],"note":""},"76":{"q":"দাসমুক্তি ঘোষণা কী করেছিল?","a":["ক্রীতদাসদের মুক্ত করেছিল","কনফেডারেসির ক্রীতদাসদের মুক্ত করেছিল","কনফেডারেট রাজ্যগুলোর ক্রীতদাসদের মুক্ত করেছিল","বেশিরভাগ দক্ষিণের রাজ্যের ক্রীতদাসদের মুক্ত করেছিল"],"note":"'Confederacy/Confederate' transliterated; no standard Bengali term."},"77":{"q":"Susan B. Anthony কী করেছিলেন?","a":["নারী অধিকারের জন্য লড়েছিলেন","নাগরিক অধিকারের জন্য লড়েছিলেন"],"note":""},"78":{"q":"১৯০০-এর দশকে যুক্তরাষ্ট্রের লড়া একটি যুদ্ধের নাম বলুন।","a":["প্রথম বিশ্বযুদ্ধ","দ্বিতীয় বিশ্বযুদ্ধ","Korean যুদ্ধ","Vietnam যুদ্ধ","(Persian) Gulf যুদ্ধ"],"note":"Place-derived war names kept in English + যুদ্ধ."},"79":{"q":"প্রথম বিশ্বযুদ্ধের সময় President কে ছিলেন?","a":["(Woodrow) Wilson"],"note":""},"80":{"q":"মহামন্দা ও দ্বিতীয় বিশ্বযুদ্ধের সময় President কে ছিলেন?","a":["(Franklin) Roosevelt"],"note":""},"81":{"q":"দ্বিতীয় বিশ্বযুদ্ধে যুক্তরাষ্ট্র কাদের বিরুদ্ধে লড়েছিল?","a":["জাপান, জার্মানি এবং ইতালি"],"note":""},"82":{"q":"President হওয়ার আগে Eisenhower একজন জেনারেল ছিলেন। তিনি কোন যুদ্ধে ছিলেন?","a":["দ্বিতীয় বিশ্বযুদ্ধ"],"note":""},"83":{"q":"স্নায়ুযুদ্ধের (Cold War) সময় যুক্তরাষ্ট্রের প্রধান উদ্বেগ কী ছিল?","a":["সাম্যবাদ (Communism)"],"note":""},"84":{"q":"কোন আন্দোলন বর্ণবৈষম্য দূর করার চেষ্টা করেছিল?","a":["নাগরিক অধিকার (আন্দোলন)"],"note":""},"85":{"q":"Martin Luther King, Jr. কী করেছিলেন?","a":["নাগরিক অধিকারের জন্য লড়েছিলেন","সকল আমেরিকানের সমতার জন্য কাজ করেছিলেন"],"note":""},"86":{"q":"September 11, 2001 তারিখে যুক্তরাষ্ট্রে কোন বড় ঘটনা ঘটেছিল?","a":["সন্ত্রাসীরা যুক্তরাষ্ট্রে আক্রমণ করেছিল।"],"note":""},"87":{"q":"যুক্তরাষ্ট্রের একটি American Indian উপজাতির (tribe) নাম বলুন।","a":["Cherokee","Navajo","Sioux","Chippewa","Choctaw","Pueblo","Apache","Iroquois","Creek","Blackfeet","Seminole","Cheyenne","Arawak","Shawnee","Mohegan","Huron","Oneida","Lakota","Crow","Teton","Hopi","Inuit"],"note":"All 22 tribe names kept in English."},"88":{"q":"যুক্তরাষ্ট্রের দুটি দীর্ঘতম নদীর একটির নাম বলুন।","a":["Missouri (নদী)","Mississippi (নদী)"],"note":""},"89":{"q":"যুক্তরাষ্ট্রের পশ্চিম উপকূলে (West Coast) কোন মহাসাগর অবস্থিত?","a":["Pacific (মহাসাগর)"],"note":""},"90":{"q":"যুক্তরাষ্ট্রের পূর্ব উপকূলে (East Coast) কোন মহাসাগর অবস্থিত?","a":["Atlantic (মহাসাগর)"],"note":""},"91":{"q":"যুক্তরাষ্ট্রের একটি অঞ্চলের (U.S. territory) নাম বলুন।","a":["Puerto Rico","U.S. Virgin Islands","American Samoa","Northern Mariana Islands","Guam"],"note":""},"92":{"q":"Canada-র সীমান্তবর্তী একটি অঙ্গরাজ্যের নাম বলুন।","a":["Maine","New Hampshire","Vermont","New York","Pennsylvania","Ohio","Michigan","Minnesota","North Dakota","Montana","Idaho","Washington","Alaska"],"note":"All 13 state names kept in English."},"93":{"q":"Mexico-র সীমান্তবর্তী একটি অঙ্গরাজ্যের নাম বলুন।","a":["California","Arizona","New Mexico","Texas"],"note":""},"94":{"q":"যুক্তরাষ্ট্রের রাজধানী কী?","a":["Washington, D.C."],"note":""},"95":{"q":"স্ট্যাচু অব লিবার্টি কোথায় অবস্থিত?","a":["New York (Harbor / পোতাশ্রয়)","Liberty Island","New Jersey","New York City-র কাছে","Hudson (River / নদী)-এ"],"note":""},"96":{"q":"পতাকায় 13টি ডোরা কেন আছে?","a":["কারণ সেখানে 13টি মূল উপনিবেশ (colonies) ছিল","কারণ ডোরাগুলো মূল উপনিবেশগুলোকে প্রতিনিধিত্ব করে"],"note":""},"97":{"q":"পতাকায় 50টি তারা কেন আছে?","a":["কারণ প্রতিটি অঙ্গরাজ্যের জন্য একটি করে তারা আছে","কারণ প্রতিটি তারা একটি অঙ্গরাজ্যকে প্রতিনিধিত্ব করে","কারণ 50টি অঙ্গরাজ্য আছে"],"note":""},"98":{"q":"জাতীয় সঙ্গীতের নাম কী?","a":["The Star-Spangled Banner"],"note":"Anthem title kept in English; proper name."},"99":{"q":"আমরা কখন স্বাধীনতা দিবস (Independence Day) উদযাপন করি?","a":["July 4"],"note":""},"100":{"q":"দুটি জাতীয় U.S. ছুটির দিনের (national holidays) নাম বলুন।","a":["নববর্ষের দিন (New Year's Day)","Martin Luther King, Jr. Day","প্রেসিডেন্টস' ডে (Presidents' Day)","স্মরণ দিবস (Memorial Day)","Juneteenth","স্বাধীনতা দিবস (Independence Day)","শ্রম দিবস (Labor Day)","Columbus Day","প্রবীণ সৈনিক দিবস (Veterans Day)","থ্যাঙ্কসগিভিং (Thanksgiving)","বড়দিন (Christmas)"],"note":"Juneteenth, MLK Jr. Day, and Columbus Day have no standard Bengali names, kept in English."}};
+ALL_QUESTIONS.forEach(q => { const b = BN_TRANSLATIONS[q.id]; if (b) { q.qbn = b.q; q.abn = b.a; q.bnNote = b.note || ""; } });
+
+// ---------- shared helpers ----------
+
+const live = document.getElementById("live");
+let liveTimer;
+function announce(text) {
+  clearTimeout(liveTimer);
+  live.textContent = "";
+  liveTimer = setTimeout(() => { live.textContent = text; }, 80);
+}
+
+function shuffle(arr) {
+  const copy = arr.slice();
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+function badgeHTML() {
+  return '<span class="badge">may change — checked ' + CHECKED + '</span>';
+}
+
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+// `highlight` (optional) is a Set of indices into question.a that the learner
+// already gave — those items are marked. Used to show WHICH of the required
+// answers landed on a partial "you gave 1 of 2" result.
+function answersHTML(question, highlight) {
+  let html = "<ul>" + question.a.map((ans, i) => {
+    const em = itemEmoji(question.id, ans);
+    const mark = em ? '<span class="ans-emoji" aria-hidden="true">' + em + "</span> " : "";
+    return highlight && highlight.has(i)
+      ? "<li><strong>" + mark + '<span aria-hidden="true">✓ </span><span class="visually-hidden">You gave this: </span>' + esc(ans) + "</strong></li>"
+      : "<li>" + mark + esc(ans) + "</li>";
+  }).join("") + "</ul>";
+  if (question.dynamic) html += "<p>" + badgeHTML() + "</p>";
+  if (question.note) html += '<p class="note">' + esc(question.note) + "</p>";
+  return html;
+}
+
+// ---------- mode switching ----------
+
+const sections = {
+  home: document.getElementById("view-home"),
+  tutor: document.getElementById("view-tutor"),
+  flash: document.getElementById("view-flash"),
+  quiz: document.getElementById("view-quiz"),
+  browse: document.getElementById("view-browse"),
+  interview: document.getElementById("view-interview"),
+  conversation: document.getElementById("view-conversation"),
+};
+const modeButtons = document.querySelectorAll('nav[aria-label="Study mode"] button');
+
+function switchMode(mode) {
+  // Any view change stops an in-flight officer line and mic capture so the spoken
+  // interview never bleeds into another screen. (No-ops when nothing is active.)
+  if ("speechSynthesis" in window) speechSynthesis.cancel();
+  cancelRecording();
+  for (const [name, section] of Object.entries(sections)) {
+    section.hidden = name !== mode;
+  }
+  modeButtons.forEach(btn => {
+    if (btn.dataset.mode === mode) btn.setAttribute("aria-current", "true");
+    else btn.removeAttribute("aria-current");
+  });
+  const heading = sections[mode].querySelector("h2");
+  document.title = mode === "home"
+    ? "U.S. Civics Test Study App — 2008 Test"
+    : heading.textContent + " — U.S. Civics Test Study App";
+  heading.focus();
+}
+
+modeButtons.forEach(btn => btn.addEventListener("click", () => switchMode(btn.dataset.mode)));
+document.querySelectorAll(".home-card").forEach(btn =>
+  btn.addEventListener("click", () => switchMode(btn.dataset.mode)));
+// Play the greeting animation once; returning to Home shows settled text.
+setTimeout(() => document.getElementById("greeting").classList.add("greeting-done"), 4600);
+
+// ---------- flashcards ----------
+
+const flash = { deck: QUESTIONS.slice(), i: 0, open: false };
+const cardBtn = document.getElementById("card-btn");
+const cardQ = document.getElementById("card-q");
+const cardHint = document.getElementById("card-hint");
+const cardAnswer = document.getElementById("card-answer");
+const cardAnswerList = document.getElementById("card-answer-list");
+const cardBadge = document.getElementById("card-badge");
+const cardNote = document.getElementById("card-note");
+const cardEmoji = document.getElementById("card-emoji");
+const cardBn = document.getElementById("card-bn");
+const flashCounter = document.getElementById("flash-counter");
+const flashMastered = document.getElementById("flash-mastered");
+const catFilter = document.getElementById("cat-filter");
+
+function currentDeck() {
+  return QUESTIONS.filter(q => catFilter.value === "All" || q.category === catFilter.value);
+}
+
+function renderCard() {
+  const q = flash.deck[flash.i];
+  flashCounter.textContent = "Question " + (flash.i + 1) + " of " + flash.deck.length;
+  // Self-review progress — a warm gold ring + bar (distinct from the Home mastery ring,
+  // which is tested-only). Ring/bar are decorative; the count lives in visible text too.
+  const known = flash.deck.filter(q => selfReviewSet.has(q.id)).length;
+  const dtot = flash.deck.length;
+  const rR = 30, rC = 2 * Math.PI * rR, rOff = rC * (1 - (dtot ? known / dtot : 0));
+  const rComplete = dtot > 0 && known === dtot;
+  const rPct = dtot ? Math.round(known / dtot * 100) : 0;
+  const rMsg = known === 0 ? "Flip a card and tap “I knew it 👍” when you’ve got it."
+    : rComplete ? "You feel ready on every card here! 🎉"
+    : "Keep going — " + (dtot - known) + " more to go in this set.";
+  flashMastered.className = "deck-review" + (rComplete ? " complete" : "");
+  flashMastered.innerHTML =
+    '<div class="review-ring-wrap">' +
+      '<svg class="review-ring" viewBox="0 0 72 72" aria-hidden="true" focusable="false">' +
+        '<circle class="review-track" cx="36" cy="36" r="' + rR + '"></circle>' +
+        '<circle class="review-fill" cx="36" cy="36" r="' + rR + '" stroke-dasharray="' + rC.toFixed(1) + '" stroke-dashoffset="' + rOff.toFixed(1) + '"></circle>' +
+      "</svg>" +
+      '<div class="review-center" aria-hidden="true"><strong>' + known + "</strong><span>of " + dtot + "</span></div>" +
+    "</div>" +
+    '<div class="review-copy">' +
+      '<p class="deck-title"><span aria-hidden="true">👍</span> ' + known + " of " + dtot +
+        ' cards you feel ready on <span class="self-note">(self-check, not a test)</span></p>' +
+      '<span class="bar" aria-hidden="true"><span class="bar-fill review-bar" style="width:' + rPct + '%"></span></span>' +
+      '<p class="deck-msg">' + rMsg + "</p>" +
+    "</div>";
+  cardQ.textContent = q.q;
+  cardBtn.setAttribute("aria-expanded", String(flash.open));
+  cardHint.textContent = flash.open ? "Hide answer" : "Show answer";
+  cardAnswer.hidden = !flash.open;
+  const art = answerArt(q.id);
+  const emoji = art ? "" : ANSWER_EMOJI[q.id];
+  cardEmoji.innerHTML = art || emoji || "";
+  cardEmoji.hidden = !(art || emoji);
+  cardAnswerList.innerHTML = q.a.map(ans => {
+    const em = itemEmoji(q.id, ans);
+    return "<li>" + (em ? '<span class="ans-emoji" aria-hidden="true">' + em + "</span> " : "") + esc(ans) + "</li>";
+  }).join("");
+  cardBadge.innerHTML = q.dynamic ? badgeHTML() : "";
+  cardBadge.hidden = !q.dynamic;
+  if (q.note) { cardNote.textContent = q.note; cardNote.hidden = false; }
+  else { cardNote.hidden = true; }
+  attachTutorButton(document.getElementById("card-tutor"), { q: q.q, a: q.a, note: q.note || "" });
+  cardBn.innerHTML = bnPanelHTML(q, "fc");
+}
+
+cardBtn.addEventListener("click", () => {
+  flash.open = !flash.open;
+  renderCard();
+  if (flash.open) {
+    const q = flash.deck[flash.i];
+    announce("Answer: " + q.a.join("; ") + (q.note ? ". " + q.note : ""));
+  } else {
+    announce("Answer hidden");
+  }
+});
+
+function moveCard(step) {
+  flash.i = (flash.i + step + flash.deck.length) % flash.deck.length;
+  flash.open = false;
+  renderCard();
+  announce("Question " + (flash.i + 1) + " of " + flash.deck.length + ": " + flash.deck[flash.i].q);
+}
+
+document.getElementById("prev-btn").addEventListener("click", () => moveCard(-1));
+document.getElementById("next-btn").addEventListener("click", () => moveCard(1));
+document.getElementById("shuffle-btn").addEventListener("click", () => {
+  flash.deck = shuffle(flash.deck);
+  flash.i = 0;
+  flash.open = false;
+  renderCard();
+  announce("Cards shuffled. Question 1 of " + flash.deck.length + ": " + flash.deck[0].q);
+});
+
+// Self-rating after a flip is SELF-REVIEW only — it does not feed tested mastery or the
+// Home readiness meter (those come from real quiz answers). "I knew it" marks the card
+// self-known; "Show me again" un-marks it and sends it to the back of the deck for this
+// session.
+function rateCard(knew) {
+  const q = flash.deck[flash.i];
+  const wasComplete = flash.deck.length > 1 && flash.deck.every(c => selfReviewSet.has(c.id));
+  if (knew) selfReviewSet.add(q.id); else selfReviewSet.delete(q.id);
+  saveSelfReview();
+  if (knew) {
+    flash.i = (flash.i + 1) % flash.deck.length;
+  } else {
+    flash.deck.splice(flash.i, 1);
+    flash.deck.push(q);
+    if (flash.deck[flash.i] === q) flash.i = 0; // was the last card — wrap to start
+  }
+  flash.open = false;
+  renderCard();
+  // Focus the (now collapsed) card button so its next-question name is read; only
+  // the terse rating result goes to the live region, to avoid echoing the question.
+  cardBtn.focus();
+  const rf = studyAction();
+  // Reward the moment the whole set becomes self-known (reduced-motion-safe).
+  const nowComplete = flash.deck.length > 1 && flash.deck.every(c => selfReviewSet.has(c.id));
+  if (knew && nowComplete && !wasComplete) { confettiBurst(); playChime("milestone"); }
+  announce((knew ? "Marked as known for self-review. " : "We'll show that one again. ") +
+    "Question " + (flash.i + 1) + " of " + flash.deck.length + "." +
+    (knew && nowComplete && !wasComplete ? " You feel ready on every card in this set!" : "") +
+    studyRewardMsg(rf));
+}
+document.getElementById("card-knew").addEventListener("click", () => rateCard(true));
+document.getElementById("card-again").addEventListener("click", () => rateCard(false));
+
+function applyFilters() {
+  flash.deck = currentDeck();
+  flash.i = 0;
+  flash.open = false;
+  renderCard();
+  announce(flash.deck.length + " questions in this set. Question 1: " + flash.deck[0].q);
+}
+catFilter.addEventListener("change", applyFilters);
+
+// ---------- progress stats (saved on this phone) ----------
+
+const STATS_KEY = "civics-stats-v1";
+function loadStats() {
+  try { return JSON.parse(localStorage.getItem(STATS_KEY)) || {}; } catch (e) { return {}; }
+}
+const stats = loadStats();
+function saveStats() {
+  try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch (e) {}
+}
+function recordResult(id, ok) {
+  const s = stats[id] || (stats[id] = { c: 0, w: 0, streak: 0 });
+  if (ok) { s.c++; s.streak++; } else { s.w++; s.streak = 0; }
+  saveStats();
+  renderHomeStats();
+  celebrateMilestones();
+}
+function overrideToCorrect(id) {
+  const s = stats[id];
+  if (s) { s.w = Math.max(0, s.w - 1); s.c++; s.streak++; saveStats(); renderHomeStats(); celebrateMilestones(); }
+}
+
+// Flashcard self-review — the learner's own "I feel ready on this" from the flashcard
+// buttons. Deliberately kept OUT of `stats` so it never moves the Home readiness meter
+// (which is tested-only); it's shown only on the Flashcards screen as a self-check.
+const SELFREVIEW_KEY = "civics-selfreview-v1";
+function loadSelfReview() { try { return new Set(JSON.parse(localStorage.getItem(SELFREVIEW_KEY)) || []); } catch (e) { return new Set(); } }
+const selfReviewSet = loadSelfReview();
+function saveSelfReview() { try { localStorage.setItem(SELFREVIEW_KEY, JSON.stringify([...selfReviewSet])); } catch (e) {} }
+
+// Clear the tested-mastery meter (ring + readiness), the flashcard self-review, and
+// the mastery-based celebrations (so they can be re-earned). Keeps the Browse read
+// quest and the personal-best score, per the reset contract.
+function resetProgress() {
+  for (const k in stats) delete stats[k];
+  saveStats();
+  selfReviewSet.clear();
+  saveSelfReview();
+  ["mastered-10", "mastered-50", "all-mastered", "cat-Government", "cat-History", "cat-Civics", "stars-all"]
+    .forEach(k => milesDone.delete(k));
+  saveMiles();
+  renderHomeStats();
+  renderCard();
+  announce("Progress reset. The mastered ring and readiness are back to the start.");
+}
+// A question is a "weak spot" once missed, until answered right twice in a row.
+function weakQuestions() {
+  return QUESTIONS.filter(q => {
+    const s = stats[q.id];
+    return s && s.w > 0 && s.streak < 2;
+  });
+}
+
+// ---------- mastery model (the reward engine's data spine) ----------
+// Derived from the existing stats[id] {c,w,streak}. Three levels, each defined as
+// an icon + a text label so every surface shows shape + words, never colour alone
+// (WCAG 1.4.1):
+//   🌱 New      — untried (no record yet)
+//   📖 Learning — tried, not yet right twice in a row
+//   ⭐ Mastered — right twice running (the same streak>=2 rule that clears a weak spot)
+const MASTERY = {
+  new:      { key: "new",      icon: "🌱", label: "New" },
+  learning: { key: "learning", icon: "📖", label: "Learning" },
+  mastered: { key: "mastered", icon: "⭐", label: "Mastered" },
+};
+function masteryFromStat(s) {
+  if (!s) return MASTERY.new;
+  return s.streak >= 2 ? MASTERY.mastered : MASTERY.learning;
+}
+function masteryOf(id) { return masteryFromStat(stats[id]); }
+// Tally levels across a question list (defaults to the active QUESTIONS set).
+function masteryCounts(list) {
+  const out = { new: 0, learning: 0, mastered: 0 };
+  (list || QUESTIONS).forEach(q => { out[masteryOf(q.id).key]++; });
+  return out;
+}
+
+// ---------- milestone celebrations ----------
+// Big moments fire once each — the achieved key is remembered on this phone so a
+// milestone never re-pops. Copy is in the husband's voice with a Bengali endearment.
+const MILE_KEY = "civics-milestones-v1";
+function loadMiles() { try { return new Set(JSON.parse(localStorage.getItem(MILE_KEY)) || []); } catch (e) { return new Set(); } }
+const milesDone = loadMiles();
+function saveMiles() { try { localStorage.setItem(MILE_KEY, JSON.stringify([...milesDone])); } catch (e) {} }
+
+function achievedMilestones() {
+  const out = [];
+  const add = (key, title, body) => out.push({ key, title, body });
+  const m = masteryCounts();
+  const total = QUESTIONS.length;
+  const isMastered = q => masteryOf(q.id).key === "mastered";
+  if (m.mastered >= 10) add("mastered-10", "10 mastered! 🌟", 'Ten down, my jaan &mdash; you&rsquo;re really doing this. <span lang="bn">ভালোবাসি।</span>');
+  if (m.mastered >= 50) add("mastered-50", "50 mastered! 🎉", "Past halfway, shundori. I&rsquo;m so proud of you. ❤️");
+  if (m.mastered >= total) add("all-mastered", "Every question mastered! 🏆", 'All of them, my love. America is lucky to get you. <span lang="bn">আমি জানতাম তুমি পারবে।</span>');
+  for (const cat of ["Government", "History", "Civics"]) {
+    const qs = QUESTIONS.filter(q => q.category === cat);
+    if (qs.length && qs.every(isMastered)) add("cat-" + cat, CATEGORY_NAMES[cat] + " complete! ✅", "A whole section mastered, jaan. Incredible. ❤️");
+  }
+  const stars = QUESTIONS.filter(q => q.star);
+  if (stars.length && stars.every(isMastered)) add("stars-all", "All your starred questions! ⭐", 'The officer&rsquo;s favorites &mdash; every one. <span lang="bn">সাবাশ!</span>');
+  return out;
+}
+
+// Fire any newly-reached milestone (skips ones already celebrated). Safe to call
+// after every graded answer; it only pops the first time each is reached.
+function celebrateMilestones() {
+  achievedMilestones().forEach(mile => {
+    if (milesDone.has(mile.key)) return;
+    milesDone.add(mile.key);
+    saveMiles();
+    showMilestone(mile);
+  });
+}
+
+// A non-modal, dismissible celebration card (per the a11y contract: not a focus
+// trap, doesn't steal focus, visible dismiss, announced politely once).
+function showMilestone(mile) {
+  let host = document.getElementById("milestone-host");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "milestone-host";
+    host.className = "milestone-host";
+    document.body.appendChild(host);
+  }
+  const card = document.createElement("div");
+  card.className = "milestone";
+  card.innerHTML =
+    '<p class="milestone-title">' + mile.title + "</p>" +
+    '<p class="milestone-body">' + mile.body + "</p>" +
+    '<button type="button" class="milestone-close">Thanks <span aria-hidden="true">❤</span></button>';
+  host.appendChild(card);
+  const remove = () => card.remove();
+  card.querySelector(".milestone-close").addEventListener("click", remove);
+  // Generous auto-dismiss, but the manual close always works and nothing is trapped.
+  setTimeout(remove, 12000);
+  playChime("milestone");
+  announce(mile.title.replace(/[🌟🎉🏆✅⭐]/g, "").trim());
+}
+
+// Readiness: estimate the chance of passing a mock interview (officer asks 10,
+// needs 6 right). Per-question odds are keyed to mastery level; the pass chance is
+// the binomial tail P(X >= 6), X ~ Binomial(10, avgP). Deliberately fuzzy — it's an
+// anti-anxiety motivator, shown as a stage + reassuring words, never a bare number.
+function nChooseK(n, k) { let c = 1; for (let i = 0; i < k; i++) c = c * (n - i) / (i + 1); return c; }
+function readinessChance() {
+  const total = QUESTIONS.length;
+  if (!total) return 0;
+  const m = masteryCounts();
+  const P = { mastered: 0.97, learning: 0.55, new: 0.15 };
+  const avgP = (m.mastered * P.mastered + m.learning * P.learning + m.new * P.new) / total;
+  let pass = 0;
+  for (let k = 6; k <= 10; k++) pass += nChooseK(10, k) * Math.pow(avgP, k) * Math.pow(1 - avgP, 10 - k);
+  return pass;
+}
+function readinessStage(p) {
+  if (p >= 0.8) return { cls: "ready", label: "You’re ready",
+    copy: "On a mock interview today you’d almost always reach 6. Go show them, my love. ❤️" };
+  if (p >= 0.4) return { cls: "almost", label: "Almost there",
+    copy: "You’re close — a few more mastered and you’re over the line. Keep going, jaan." };
+  return { cls: "notyet", label: "Not yet — keep going",
+    copy: "Every question you master lifts your odds. Start with Flashcards and your starred ones." };
+}
+
+// The "Path to Citizenship" progress hero: a mastered ring, per-category bars, and
+// warm copy. Every value has a real text equivalent; the ring/bars are decorative
+// (aria-hidden) and the hero is deliberately NOT a live region — its updates are
+// ambient, so a rating elsewhere doesn't announce here (per the a11y contract).
+// ---------- N1: daily habit loop, momentum, sound, count-up ----------
+function reduceMotion() { return matchMedia("(prefers-reduced-motion: reduce)").matches; }
+function dayKey(d) { d = d || new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+function prevDayKey(d) { const y = new Date(d || new Date()); y.setDate(y.getDate() - 1); return dayKey(y); }
+
+// Study streak — consecutive calendar days with any study. Non-punitive.
+const STREAK_KEY = "civics-streak-v1";
+function loadStreak() { try { return JSON.parse(localStorage.getItem(STREAK_KEY)) || { last: "", count: 0, best: 0 }; } catch (e) { return { last: "", count: 0, best: 0 }; } }
+let streak = loadStreak();
+function saveStreak() { try { localStorage.setItem(STREAK_KEY, JSON.stringify(streak)); } catch (e) {} }
+// Pure: advance for `today` (`yesterday` = the day before). Same-day is a no-op (latched).
+function advanceStreak(s, today, yesterday) {
+  if (s.last === today) return { streak: s, dayUp: false };
+  const count = s.last === yesterday ? (s.count || 0) + 1 : 1;
+  return { streak: { last: today, count: count, best: Math.max(s.best || 0, count) }, dayUp: true };
+}
+// What to SHOW without mutating: the streak is alive only if the last day was today or yesterday.
+function liveStreak(s, today, yesterday) { return (s.last === today || s.last === yesterday) ? (s.count || 0) : 0; }
+
+// Daily goal — a light "N of 10 today".
+const DAILYGOAL_KEY = "civics-dailygoal-v1";
+const DAILY_TARGET = 10;
+function loadDaily() { try { return JSON.parse(localStorage.getItem(DAILYGOAL_KEY)) || { date: "", count: 0 }; } catch (e) { return { date: "", count: 0 }; } }
+let daily = loadDaily();
+function saveDaily() { try { localStorage.setItem(DAILYGOAL_KEY, JSON.stringify(daily)); } catch (e) {} }
+// Pure: count one action toward today's goal. `justHit` true only on the crossing to target (latched).
+function bumpDaily(d, today, target) {
+  const was = d.date === today ? (d.count || 0) : 0;
+  const count = was + 1;
+  return { daily: { date: today, count: count }, justHit: was < target && count >= target };
+}
+function todayCount(d, today) { return d.date === today ? (d.count || 0) : 0; }
+
+// One study action: advance streak + daily goal, refresh Home. Returns latch flags so the
+// caller folds ONE announcement into its own (the #live region holds one message at a time).
+function studyAction() {
+  const now = new Date(), t = dayKey(now), y = prevDayKey(now);
+  const sr = advanceStreak(streak, t, y); streak = sr.streak; saveStreak();
+  const dg = bumpDaily(daily, t, DAILY_TARGET); daily = dg.daily; saveDaily();
+  renderHomeStats();
+  if (dg.justHit) playChime("milestone");
+  return { dayUp: sr.dayUp, justHitGoal: dg.justHit };
+}
+function studyRewardMsg(flags) {
+  const parts = [];
+  if (flags.dayUp && streak.count > 1) parts.push(streak.count + " day streak!");
+  if (flags.justHitGoal) parts.push("Daily goal reached — " + DAILY_TARGET + " today!");
+  return parts.length ? " " + parts.join(" ") : "";
+}
+function announceReward(flags) { const msg = studyRewardMsg(flags).trim(); if (msg) announce(msg); }
+
+// Progress tier (momentum badge) — pure from mastered/total.
+function tierFor(mastered, total) {
+  const pct = total ? mastered / total : 0;
+  if (total > 0 && mastered >= total) return { key: "ready", label: "Ready", icon: "🎓" };
+  if (pct >= 0.75) return { key: "almost", label: "Almost a citizen", icon: "🏅" };
+  if (pct >= 0.5) return { key: "half", label: "Halfway there", icon: "⭐" };
+  if (pct >= 0.25) return { key: "feet", label: "Finding your feet", icon: "🚶" };
+  if (mastered > 0) return { key: "started", label: "Getting started", icon: "📖" };
+  return { key: "begin", label: "Just beginning", icon: "🌱" };
+}
+
+// A daily-stable note in the husband's voice (same all day; rotates by date).
+const HOME_NOTES = [
+  "Proud of you every single day, my love. ❤️",
+  "One question at a time — you’re doing beautifully, jaan.",
+  "I believe in you completely, shundori. 💛",
+  "Look how far you’ve come already. Keep going!",
+  "America is lucky to get you, Meri Jaan.",
+  "Small steps every day add up to a big win. I’m with you. 🤍",
+  "You’re smarter than you give yourself credit for, jaan."
+];
+function dailyNote(d) {
+  const now = d || new Date();
+  const doy = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  return HOME_NOTES[doy % HOME_NOTES.length];
+}
+
+// Count-up on a DECORATIVE (aria-hidden) number. Commits the true integer through one path;
+// reduced-motion snaps. No aria-live ancestor, so AT never sees a tween.
+function countUp(el, from, to) {
+  if (!el) return;
+  if (el._raf) { cancelAnimationFrame(el._raf); el._raf = null; }
+  if (from === to || reduceMotion()) { el.textContent = String(to); return; }
+  const dur = 500, start = performance.now();
+  const step = now => {
+    const p = Math.min(1, (now - start) / dur);
+    el.textContent = String(Math.round(from + (to - from) * p));
+    if (p < 1) el._raf = requestAnimationFrame(step);
+    else { el.textContent = String(to); el._raf = null; }
+  };
+  el._raf = requestAnimationFrame(step);
+}
+let prevMastered = null, prevGoal = null;
+
+// Opt-in sound (default OFF). Additive to the visible verdict + announce() — never the sole cue.
+const SOUND_KEY = "civics-sound-v1";
+function sfxOn() { return localStorage.getItem(SOUND_KEY) !== "off"; } // default ON unless turned off
+let audioCtx = null;
+function ensureAudio() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch (e) {}
+}
+function playChime(kind) {
+  if (!sfxOn()) return;
+  ensureAudio(); // lazily unlock on the first study gesture (sound is ON by default)
+  if (!audioCtx) return;
+  try {
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = "sine"; o.connect(g); g.connect(audioCtx.destination);
+    const t = audioCtx.currentTime;
+    const notes = kind === "milestone" ? [523.25, 659.25, 783.99] : [659.25, 987.77];
+    notes.forEach((f, i) => o.frequency.setValueAtTime(f, t + i * 0.09));
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.13, t + 0.02);
+    const end = t + notes.length * 0.09 + 0.05;
+    g.gain.exponentialRampToValueAtTime(0.0001, end);
+    o.start(t); o.stop(end + 0.02);
+  } catch (e) {}
+}
+
+function renderHomeStats() {
+  const host = document.getElementById("home-stats");
+  const total = QUESTIONS.length;
+  const m = masteryCounts();
+  const mastered = m.mastered;
+  const R = 52, C = 2 * Math.PI * R;
+  const offset = C * (1 - (total ? mastered / total : 0));
+
+  // N1: tier badge, streak, daily goal, daily note.
+  const tier = tierFor(mastered, total);
+  const tKey = dayKey(), yKey = prevDayKey();
+  const dispStreak = liveStreak(streak, tKey, yKey);
+  const gCount = todayCount(daily, tKey);
+  const GR = 24, GC = 2 * Math.PI * GR, gOff = GC * (1 - Math.min(1, gCount / DAILY_TARGET));
+  const tierBadge = '<p class="tier-badge tier-' + tier.key + '"><span aria-hidden="true">' + tier.icon + "</span> " + tier.label + "</p>";
+  const todayBlock =
+    '<div class="today">' +
+      '<div class="today-streak"><span class="flame" aria-hidden="true">🔥</span>' +
+        '<span class="today-streak-text"><strong>' + dispStreak + "</strong> day" + (dispStreak === 1 ? "" : "s") + " in a row" +
+          (streak.best > 1 ? ' <span class="streak-best">&middot; best ' + streak.best + "</span>" : "") + "</span></div>" +
+      '<div class="today-goal">' +
+        '<div class="goal-ring-wrap">' +
+          '<svg class="goal-ring" viewBox="0 0 56 56" aria-hidden="true" focusable="false">' +
+            '<circle class="goal-track" cx="28" cy="28" r="' + GR + '"></circle>' +
+            '<circle class="goal-fill" cx="28" cy="28" r="' + GR + '" stroke-dasharray="' + GC.toFixed(1) + '" stroke-dashoffset="' + gOff.toFixed(1) + '"></circle>' +
+          "</svg>" +
+          '<div class="goal-center" aria-hidden="true"><strong>' + Math.min(gCount, DAILY_TARGET) + "</strong></div>" +
+        "</div>" +
+        '<p class="goal-text">' + (gCount >= DAILY_TARGET
+          ? "Daily goal done &mdash; " + gCount + " today! 🎉"
+          : gCount + " of " + DAILY_TARGET + " studied today") + "</p>" +
+      "</div>" +
+    "</div>";
+
+  const legend = [MASTERY.mastered, MASTERY.learning, MASTERY.new].map(lvl =>
+    '<span aria-hidden="true">' + lvl.icon + "</span> " + m[lvl.key] + " " + lvl.label.toLowerCase()
+  ).join(" &middot; ");
+
+  const bars = ["Government", "History", "Civics"].map(cat => {
+    const qs = QUESTIONS.filter(q => q.category === cat);
+    const done = qs.filter(q => masteryOf(q.id).key === "mastered").length;
+    const pct = qs.length ? Math.round(done / qs.length * 100) : 0;
+    return "<li>" +
+      '<div class="bar-row"><span class="cat-name">' + CATEGORY_NAMES[cat] + "</span>" +
+      '<span class="cat-count">' + done + " of " + qs.length + " mastered</span></div>" +
+      '<span class="bar" aria-hidden="true"><span class="bar-fill" style="width:' + pct + '%"></span></span>' +
+      "</li>";
+  }).join("");
+
+  const msg = mastered === 0
+    ? "Every question you learn is one step closer. Start whenever you’re ready. ❤️"
+    : mastered === total
+      ? "You’ve mastered every question. You’re ready, Meri Jaan. 🎉"
+      : "You’re on your way — " + mastered + " mastered, " + (total - mastered) + " to go. Keep going!";
+
+  const weak = weakQuestions().length;
+  const weakLine = weak
+    ? '<p class="stat-line stat-weak">' + weak + (weak === 1 ? " question" : " questions") + " to retry &mdash; Quiz &rarr; Practice weak spots</p>"
+    : "";
+
+  const p = readinessChance();
+  const stage = readinessStage(p);
+  const outOf10 = Math.round(p * 10);
+  const readinessBlock =
+    '<div class="readiness readiness-' + stage.cls + '">' +
+      '<h4 class="readiness-h">Interview readiness</h4>' +
+      '<p class="readiness-stage">' + stage.label + "</p>" +
+      '<span class="meter" aria-hidden="true"><span class="meter-fill" style="width:' + Math.round(p * 100) + '%"></span></span>' +
+      '<p class="readiness-copy">' + stage.copy +
+        (p >= 0.5 ? " In a practice interview, you’d reach 6 about " + outOf10 + " times out of 10." : "") +
+      "</p>" +
+    "</div>";
+
+  host.innerHTML =
+    '<h3 id="hero-h">Path to Citizenship</h3>' +
+    '<div class="hero-top">' +
+      '<div class="ring-wrap">' +
+        '<svg class="ring" viewBox="0 0 120 120" aria-hidden="true" focusable="false">' +
+          '<circle class="ring-track" cx="60" cy="60" r="' + R + '"></circle>' +
+          '<circle class="ring-fill" cx="60" cy="60" r="' + R + '" ' +
+            'stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + offset.toFixed(1) + '"></circle>' +
+        "</svg>" +
+        '<div class="ring-center" aria-hidden="true"><strong>' + mastered + "</strong><span>of " + total + "</span></div>" +
+      "</div>" +
+      '<div class="hero-copy">' +
+        tierBadge +
+        '<p class="hero-count">' + mastered + " of " + total + " questions mastered</p>" +
+        '<p class="hero-legend">' + legend + "</p>" +
+        '<p class="hero-msg">' + msg + "</p>" +
+      "</div>" +
+    "</div>" +
+    todayBlock +
+    '<ul class="category-bars">' + bars + "</ul>" +
+    readinessBlock +
+    '<p class="home-note"><span aria-hidden="true">💌</span> ' + dailyNote() + "</p>" +
+    weakLine +
+    '<div class="prefs"><button type="button" id="sfx-toggle" class="pref-toggle" aria-pressed="' + (sfxOn() ? "true" : "false") + '" aria-label="Sound effects">' +
+      '<span aria-hidden="true">🔊 Sound effects: <span class="sfx-state">' + (sfxOn() ? "On" : "Off") + "</span></span></button></div>" +
+    '<div class="reset-wrap"><button type="button" class="reset-btn">Reset progress</button></div>';
+
+  // Count-up the decorative ring + goal numbers (aria-hidden; real values are in the text).
+  countUp(host.querySelector(".ring-center strong"), prevMastered === null ? mastered : prevMastered, mastered);
+  prevMastered = mastered;
+  const gShown = Math.min(gCount, DAILY_TARGET);
+  countUp(host.querySelector(".goal-center strong"), prevGoal === null ? gShown : prevGoal, gShown);
+  prevGoal = gShown;
+
+  // Sound toggle: aria-pressed carries state; fixed accessible name; unlock audio on turn-on.
+  const sfxBtn = host.querySelector("#sfx-toggle");
+  sfxBtn.addEventListener("click", () => {
+    const on = !sfxOn();
+    try { localStorage.setItem(SOUND_KEY, on ? "on" : "off"); } catch (e) {}
+    sfxBtn.setAttribute("aria-pressed", on ? "true" : "false");
+    sfxBtn.querySelector(".sfx-state").textContent = on ? "On" : "Off";
+    if (on) { ensureAudio(); playChime("correct"); }
+    announce("Sound effects " + (on ? "on" : "off") + ".");
+  });
+
+  // A quiet, two-step reset. The confirm is a role="alert" so it's announced; focus
+  // moves to the primary action; "Keep it" (or the next render) collapses it.
+  const resetWrap = host.querySelector(".reset-wrap");
+  resetWrap.querySelector(".reset-btn").addEventListener("click", () => {
+    resetWrap.innerHTML =
+      '<p class="reset-confirm" role="alert">Reset the mastered ring, readiness, and flashcard self-review? ' +
+      "Your read list and best score stay.</p>" +
+      '<div class="row"><button type="button" class="btn btn-wrong reset-yes">Yes, reset</button>' +
+      '<button type="button" class="btn-quiet reset-cancel">Keep it</button></div>';
+    resetWrap.querySelector(".reset-yes").addEventListener("click", resetProgress);
+    resetWrap.querySelector(".reset-cancel").addEventListener("click", renderHomeStats);
+    resetWrap.querySelector(".reset-yes").focus();
+  });
+}
+
+// ---------- answer checking ----------
+
+function normalizeText(text) {
+  return text.toLowerCase()
+    .replace(/(\d+)(st|nd|rd|th)\b/g, "$1")
+    .replace(/['’]/g, "")                 // drop apostrophes so "New Year's"/"don't" -> "new years"/"dont" (an ESL learner types no apostrophe)
+    .replace(/[“”".,!?;:()]/g, " ")
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/^the /, "");
+}
+// Accepted forms of an official answer: with the parenthetical words, without
+// them, and any bare number, e.g. "twenty-seven (27)" -> twenty seven 27 / twenty seven / 27.
+function answerVariants(ans) {
+  const out = new Set();
+  out.add(normalizeText(ans));
+  out.add(normalizeText(ans.replace(/\([^)]*\)/g, " ")));
+  (ans.match(/\((\d+)\)/g) || []).forEach(n => out.add(n.replace(/[()]/g, "")));
+  // "eighteen (18) and older" also counts as "18 and older"
+  out.add(normalizeText(ans.replace(/\S+\s*\((\d+)\)/g, "$1")));
+  // "to print money" / "because there is one star for each state" also count
+  // without the lead-in words
+  [...out].forEach(v => {
+    let short = v;
+    for (;;) {
+      const next = short.replace(/^(to|because of|because|there is|there are|there was|there were) /, "");
+      if (next === short) break;
+      short = next;
+      out.add(short);
+    }
+  });
+  out.delete("");
+  return [...out];
+}
+function editDistance(a, b) {
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+  for (let i = 1; i <= a.length; i++)
+    for (let j = 1; j <= b.length; j++)
+      dp[i][j] = Math.min(dp[i - 1][j] + 1, dp[i][j - 1] + 1, dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return dp[a.length][b.length];
+}
+function typoAllowance(len) { return len <= 4 ? 0 : len <= 7 ? 1 : 2; }
+// A run of input words equals an accepted answer if it's identical or a small
+// edit-distance away (typo tolerance scaled to the answer's length).
+function windowMatches(window, variant) {
+  return window === variant || editDistance(window, variant) <= typoAllowance(variant.length);
+}
+// Number of DISTINCT official answers the input satisfies. Built for an ESL
+// learner: forgiving of spelling slips AND of missing punctuation. The input is
+// tokenized (word list), then answers are greedily matched against consecutive
+// token windows, longest first — each answer and each word claimed at most once.
+// So "life, liberty", "life liberty", and "life liberti" all score 2, while
+// "life life" scores 1. Because whole answers are matched as token windows,
+// answers that themselves contain a comma or "and" (e.g. "Martin Luther King,
+// Jr. Day", "Secretary of Health and Human Services") are never mis-split.
+// Set of indices into q.a that the input satisfies (see matchCount).
+function matchedIndices(input, q) {
+  const tokens = normalizeText(input).split(" ").filter(Boolean);
+  const claimed = new Set();
+  if (!tokens.length) return claimed;
+  const variantTokens = q.a.map(ans =>
+    [...new Set(answerVariants(ans))].map(v => v.split(" ").filter(Boolean)).filter(t => t.length));
+  // Every exact spelling of any answer, so the typo pass can refuse to spend a
+  // perfectly-spelled answer as a "typo" of a different one.
+  const exactForms = new Set();
+  for (const vts of variantTokens) for (const vt of vts) exactForms.add(vt.join(" "));
+  const used = new Array(tokens.length).fill(false);
+  const spanFree = (start, len) => {
+    for (let k = start; k < start + len; k++) if (used[k]) return false;
+    return true;
+  };
+  // Greedy longest-first sweep over the still-unused tokens. `exactOnly` claims
+  // only identical windows; the later typo pass allows near-misses on what's
+  // left. Two reasons exact matches go first: (1) so a correctly-spelled answer
+  // isn't consumed as a typo of a *different* answer — "south carolina" is within
+  // the 2-edit tolerance of "north carolina", so a single pass could claim the
+  // wrong Carolina; and (2) a window that is itself an exact official answer is
+  // never lent to the typo pass, so typing "south carolina" twice can't fill the
+  // "north carolina" slot the second time around.
+  const sweep = (exactOnly) => {
+    let pos = 0;
+    while (pos < tokens.length) {
+      if (used[pos]) { pos += 1; continue; }
+      let bestIdx = -1, bestLen = 0;
+      for (let i = 0; i < q.a.length; i++) {
+        if (claimed.has(i)) continue;
+        for (const vt of variantTokens[i]) {
+          if (vt.length <= bestLen || pos + vt.length > tokens.length) continue;
+          if (!spanFree(pos, vt.length)) continue;
+          const window = tokens.slice(pos, pos + vt.length).join(" ");
+          const target = vt.join(" ");
+          const ok = exactOnly
+            ? window === target
+            : !exactForms.has(window) && windowMatches(window, target);
+          if (ok) { bestIdx = i; bestLen = vt.length; }
+        }
+      }
+      if (bestIdx >= 0) {
+        claimed.add(bestIdx);
+        for (let k = pos; k < pos + bestLen; k++) used[k] = true;
+        pos += bestLen;
+      } else pos += 1;
+    }
+  };
+  sweep(true);
+  sweep(false);
+  return claimed;
+}
+function matchCount(input, q) {
+  return matchedIndices(input, q).size;
+}
+function isCorrectAnswer(input, q) {
+  return matchCount(input, q) >= (q.need || 1);
+}
+
+// ---------- speech ----------
+
+function speak(text, onEnd, opts) {
+  opts = opts || {};
+  if (!("speechSynthesis" in window)) { if (onEnd) onEnd(); return false; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = opts.lang || "en-US";
+  if (opts.voice) u.voice = opts.voice;
+  u.rate = 0.9;
+  // onEnd drives spoken turn-taking (open the mic once the officer stops talking).
+  // Guard so we fire exactly once whether the utterance ends or errors.
+  if (onEnd) {
+    let done = false;
+    const fire = () => { if (!done) { done = true; onEnd(); } };
+    u.onend = fire;
+    u.onerror = fire;
+  }
+  speechSynthesis.speak(u);
+  return true;
+}
+
+// Speak Bengali only if the device actually has a Bengali voice installed; otherwise
+// stay silent (the English voice can't pronounce Bengali script — it comes out broken).
+// The Bengali is always on screen regardless, so nothing is lost when we skip audio.
+function speakBengali(text) {
+  if (!("speechSynthesis" in window)) return;
+  const v = speechSynthesis.getVoices().find(x => (x.lang || "").toLowerCase().indexOf("bn") === 0);
+  if (!v) return;
+  speak(text, null, { lang: v.lang, voice: v });
+}
+
+// ---------- speech input (mock interview) ----------
+// Records her spoken answer, detects when she stops (voice-activity detection),
+// encodes a 16 kHz mono WAV in the browser, and posts it to the local whisper
+// proxy (/transcribe). Kept dependency-free: ScriptProcessor for PCM capture (no
+// AudioWorklet module file), a hand-rolled WAV encoder, and an RMS silence gate.
+
+// Tuned for a nervous, non-native speaker: a long silence window so a mid-answer
+// pause doesn't end her turn, a higher start threshold so the officer's TTS tail
+// doesn't self-trigger, and generous begin/max windows. All recoverable — the
+// visible/announced status + tap-to-retry + "Type instead" fallback still apply.
+const VAD = { START_RMS: 0.02, SILENCE_MS: 2500, INIT_SILENCE_MS: 10000, MAX_MS: 22000 };
+// Beat between the officer finishing and the mic opening: lets the TTS audio drain
+// (so it isn't mistaken for speech) and gives her a moment before it's listening.
+const MIC_LEAD_IN_MS = 500;
+
+function micSupported() {
+  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia &&
+    (window.AudioContext || window.webkitAudioContext));
+}
+
+// Pure end-of-speech decision, split out so tests.html can exercise the thresholds.
+// Returns a stop reason ("silence" | "no-speech" | "max") or null to keep listening.
+function vadShouldStop(s, now) {
+  if (s.speechStarted && now - s.lastVoice > VAD.SILENCE_MS) return "silence";
+  if (!s.speechStarted && now - s.startAt > VAD.INIT_SILENCE_MS) return "no-speech";
+  if (now - s.startAt > VAD.MAX_MS) return "max";
+  return null;
+}
+
+function flattenPcm(chunks) {
+  let len = 0; for (const c of chunks) len += c.length;
+  const out = new Float32Array(len);
+  let o = 0; for (const c of chunks) { out.set(c, o); o += c.length; }
+  return out;
+}
+
+// Box-average downsample to outRate (whisper wants 16 kHz). Averaging the window
+// (rather than picking one sample) knocks down aliasing cheaply.
+function downsample(buf, inRate, outRate) {
+  if (!buf.length || outRate >= inRate) return buf;
+  const ratio = inRate / outRate;
+  const outLen = Math.floor(buf.length / ratio);
+  const out = new Float32Array(outLen);
+  for (let i = 0; i < outLen; i++) {
+    const start = Math.floor(i * ratio);
+    const end = Math.min(buf.length, Math.floor((i + 1) * ratio));
+    let sum = 0, n = 0;
+    for (let j = start; j < end; j++) { sum += buf[j]; n++; }
+    out[i] = n ? sum / n : 0;
+  }
+  return out;
+}
+
+// 16-bit PCM mono WAV. Returns a Blob ready to POST.
+function encodeWav(pcm, inRate, outRate) {
+  const data = downsample(pcm, inRate, outRate);
+  const buffer = new ArrayBuffer(44 + data.length * 2);
+  const view = new DataView(buffer);
+  const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+  writeStr(0, "RIFF");
+  view.setUint32(4, 36 + data.length * 2, true);
+  writeStr(8, "WAVE");
+  writeStr(12, "fmt ");
+  view.setUint32(16, 16, true);         // fmt chunk size
+  view.setUint16(20, 1, true);          // PCM
+  view.setUint16(22, 1, true);          // mono
+  view.setUint32(24, outRate, true);    // sample rate
+  view.setUint32(28, outRate * 2, true);// byte rate (rate * blockAlign)
+  view.setUint16(32, 2, true);          // block align (mono * 16-bit)
+  view.setUint16(34, 16, true);         // bits per sample
+  writeStr(36, "data");
+  view.setUint32(40, data.length * 2, true);
+  let off = 44;
+  for (let i = 0; i < data.length; i++) {
+    const s = Math.max(-1, Math.min(1, data[i]));
+    view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+    off += 2;
+  }
+  return new Blob([view], { type: "audio/wav" });
+}
+
+const micState = { active: false, ctx: null, stream: null, source: null, processor: null,
+  pcm: [], startAt: 0, lastVoice: 0, speechStarted: false, mode: "auto", done: null, err: null };
+
+// Start capturing. mode "auto" self-stops on silence; mode "manual" records until
+// stopRecording() is called (the tap fallback). onFinal gets a WAV Blob; onError
+// gets "mic-denied" | "no-speech".
+async function startRecording(mode, onFinal, onError) {
+  if (micState.active) return;
+  micState.active = true; micState.mode = mode; micState.pcm = [];
+  micState.speechStarted = false; micState.done = onFinal; micState.err = onError;
+  try {
+    micState.stream = await navigator.mediaDevices.getUserMedia({
+      audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true }
+    });
+  } catch (e) { micState.active = false; if (onError) onError("mic-denied"); return; }
+  const AC = window.AudioContext || window.webkitAudioContext;
+  micState.ctx = new AC();
+  // iOS/WebKit: when the mic auto-opens from the officer's speech callback (not a
+  // direct tap) the context can come up "suspended", so onaudioprocess never fires
+  // and we'd record silence until the timeout, surfacing a misleading "no-speech".
+  // resume() nudges it running; on the WebKit builds where it rejects, fail through
+  // onError so the button/status don't get stuck showing "listening".
+  try {
+    if (micState.ctx.state === "suspended") await micState.ctx.resume();
+  } catch (e) { micState.active = false; if (onError) onError("trouble"); return; }
+  micState.source = micState.ctx.createMediaStreamSource(micState.stream);
+  micState.processor = micState.ctx.createScriptProcessor(4096, 1, 1);
+  micState.startAt = performance.now();
+  micState.lastVoice = micState.startAt;
+  micState.processor.onaudioprocess = e => {
+    const input = e.inputBuffer.getChannelData(0);
+    micState.pcm.push(new Float32Array(input));
+    let sum = 0;
+    for (let i = 0; i < input.length; i++) sum += input[i] * input[i];
+    const rms = Math.sqrt(sum / input.length);
+    const now = performance.now();
+    if (rms > VAD.START_RMS) { micState.speechStarted = true; micState.lastVoice = now; }
+    if (micState.mode === "auto") {
+      const stop = vadShouldStop(micState, now);
+      if (stop) finishRecording(stop === "no-speech" ? "no-speech" : null);
+    } else if (now - micState.startAt > VAD.MAX_MS) {
+      finishRecording(null);
+    }
+  };
+  micState.source.connect(micState.processor);
+  // Route to destination so onaudioprocess fires; output buffer is left silent, so
+  // no mic passthrough / feedback is heard.
+  micState.processor.connect(micState.ctx.destination);
+}
+
+// Tap fallback / push-to-talk: force-finalize whatever has been recorded.
+function stopRecording() { if (micState.active) finishRecording(null); }
+
+// Hard cancel — tear down the mic without firing onFinal/onError. Used when she
+// leaves the interview mid-listen so a stale transcript can't grade a gone screen.
+function cancelRecording() {
+  if (!micState.active) return;
+  micState.active = false; micState.done = null; micState.err = null;
+  try { micState.processor.disconnect(); } catch (e) {}
+  try { micState.source.disconnect(); } catch (e) {}
+  try { micState.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+  try { micState.ctx.close(); } catch (e) {}
+  micState.processor = micState.source = micState.stream = micState.ctx = null;
+  micState.pcm = [];
+}
+
+function finishRecording(reason) {
+  if (!micState.active) return;
+  micState.active = false;
+  const pcm = micState.pcm;
+  const sr = micState.ctx ? micState.ctx.sampleRate : 48000;
+  const onFinal = micState.done, onError = micState.err;
+  try { micState.processor.disconnect(); } catch (e) {}
+  try { micState.source.disconnect(); } catch (e) {}
+  try { micState.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+  try { micState.ctx.close(); } catch (e) {}
+  micState.processor = micState.source = micState.stream = micState.ctx = null;
+  micState.pcm = [];
+  if (reason === "no-speech") { if (onError) onError("no-speech"); return; }
+  const wav = encodeWav(flattenPcm(pcm), sr, 16000);
+  if (onFinal) onFinal(wav);
+}
+
+// POST the WAV to the whisper proxy; resolves to the transcript string, rejects on
+// any failure so callers can offer "try again / type it".
+function transcribe(wavBlob) {
+  return fetch("/transcribe", { method: "POST", headers: { "Content-Type": "audio/wav" }, body: wavBlob })
+    .then(r => (r.ok ? r.json() : Promise.reject(new Error("http"))))
+    .then(d => { if (d && typeof d.text === "string") return d.text; throw new Error("no text"); });
+}
+
+// ---------- quiz ----------
+
+const quizBody = document.getElementById("quiz-body");
+const quiz = { pool: null, mode: "practice", i: 0, results: [], answered: false, stopOffered: false };
+
+const PASS_NOTES = [
+  "I knew you could do it, my shundori. ❤️",
+  "That&rsquo;s my jaan &mdash; six and up, just like test day. 🇺🇸",
+  '<span lang="bn">সাবাশ, আমার জান!</span> So proud of you. ❤️',
+  "America is lucky to get you, my love. ❤️"
+];
+const MISS_NOTES = [
+  "So close, jaan. Every miss now is a point on test day. ❤️",
+  '<span lang="bn">তুমি পারবে, জান।</span> One more round &mdash; I believe in you.',
+  "Deep breath, my love. Try the weak spots &mdash; I&rsquo;m right here. ❤️"
+];
+function pickNote(list) { return list[Math.floor(Math.random() * list.length)]; }
+
+function quizIntro() {
+  quiz.pool = null;
+  const weak = weakQuestions().length;
+  quizBody.innerHTML =
+    '<p>Ten random questions. Type each answer &mdash; the app checks it against the official accepted answers. 6 or more is a pass.</p>' +
+    '<div class="quiz-options">' +
+    '<button type="button" class="btn" id="quiz-start">Start quiz<span class="btn-sub">Question shown on screen</span></button>' +
+    '<button type="button" class="btn" id="quiz-interview">Interview mode<span class="btn-sub">Question read out loud, like the real officer</span></button>' +
+    (weak ? '<button type="button" class="btn-quiet" id="quiz-weak">Practice weak spots (' + weak + ')<span class="btn-sub">Only the questions you have missed</span></button>' : "") +
+    "</div>";
+  document.getElementById("quiz-start").addEventListener("click", () => startQuiz("practice"));
+  document.getElementById("quiz-interview").addEventListener("click", () => startQuiz("interview"));
+  const weakBtn = document.getElementById("quiz-weak");
+  if (weakBtn) weakBtn.addEventListener("click", () => startQuiz("weak"));
+}
+
+function startQuiz(mode) {
+  quiz.mode = mode;
+  const source = mode === "weak" ? weakQuestions() : QUESTIONS;
+  quiz.pool = shuffle(source).slice(0, 10);
+  quiz.i = 0;
+  quiz.results = [];
+  quiz.stopOffered = false;
+  renderQuizQuestion();
+}
+
+// Personal best (highest scored-round result on this phone).
+const BEST_KEY = "civics-best-v1";
+function loadBest() { const n = parseInt(localStorage.getItem(BEST_KEY), 10); return isNaN(n) ? 0 : n; }
+function saveBest(n) { try { localStorage.setItem(BEST_KEY, String(n)); } catch (e) {} }
+
+// The accepted-answers reveal: a decorative emoji, the answers (optionally marking
+// which she gave), and the Bengali panel — shared by the live reveal and re-renders.
+function quizRevealHTML(q, highlight) {
+  const art = answerArt(q.id);
+  const mark = art || ANSWER_EMOJI[q.id] || "";
+  return (mark ? '<div class="answer-emoji" aria-hidden="true">' + mark + "</div>" : "") +
+    "<h4>Accepted answers</h4>" + answersHTML(q, highlight) + bnPanelHTML(q, "qz");
+}
+
+// Visual run of consecutive corrects in the current round (2+). The dots are
+// decorative; "N in a row" is the real text equivalent.
+function streakPipsHTML() {
+  let run = 0;
+  for (let k = quiz.results.length - 1; k >= 0 && quiz.results[k].correct; k--) run++;
+  if (run < 2) return "";
+  return '<p class="streak-pips"><span class="pips" aria-hidden="true">' + "●".repeat(Math.min(run, 10)) +
+    '</span> <span class="streak-count">' + run + " in a row</span> <span aria-hidden=\"true\">🔥</span></p>";
+}
+
+function renderQuizQuestion() {
+  const q = quiz.pool[quiz.i];
+  quiz.answered = false;
+  const spoken = quiz.mode === "interview";
+  const need = q.need || 1;
+  const needWord = need === 3 ? "three" : "two";
+  quizBody.innerHTML =
+    '<p class="progress">Question ' + (quiz.i + 1) + " of " + quiz.pool.length + "</p>" +
+    streakPipsHTML() +
+    '<div class="card"><div class="card-pad">' +
+      '<span class="q-text" id="quiz-q"' + (spoken ? " hidden" : "") + ">" + esc(q.q) + "</span>" +
+      (spoken ? '<span class="hint">🔊 Listen to the question</span>' : "") +
+    "</div>" +
+    '<div class="answer-panel" id="quiz-answer" hidden>' + quizRevealHTML(q) + "</div></div>" +
+    (spoken ? '<div class="row"><button type="button" class="btn-quiet" id="quiz-replay">🔊 Play again</button>' +
+              '<button type="button" class="btn-quiet" id="quiz-showq">Show the question</button></div>' : "") +
+    '<form id="quiz-form">' +
+      '<label class="quiz-label" for="quiz-input">Type your answer</label>' +
+      (need > 1 ? '<p id="quiz-need" class="quiz-need">Name ' + needWord + ' &mdash; the officer will ask for ' + needWord + '. Separate them with a comma or the word &ldquo;and&rdquo;.</p>' : "") +
+      '<input type="text" id="quiz-input" autocomplete="off" autocapitalize="off" spellcheck="false"' + (need > 1 ? ' aria-describedby="quiz-need"' : "") + '>' +
+      '<div class="row"><button type="submit" class="btn">Check answer</button>' +
+      '<button type="button" class="btn-quiet" id="quiz-idk">I don&rsquo;t know</button></div>' +
+    "</form>" +
+    '<div id="quiz-verdict"></div>';
+  document.getElementById("quiz-form").addEventListener("submit", e => {
+    e.preventDefault();
+    gradeAnswer(document.getElementById("quiz-input").value);
+  });
+  document.getElementById("quiz-idk").addEventListener("click", () => gradeAnswer(null));
+  if (spoken) {
+    document.getElementById("quiz-replay").addEventListener("click", () => speak(q.q));
+    document.getElementById("quiz-showq").addEventListener("click", () => {
+      document.getElementById("quiz-q").hidden = false;
+    });
+    if (!speak(q.q)) document.getElementById("quiz-q").hidden = false;
+  }
+  document.getElementById("quiz-input").focus();
+  announce("Question " + (quiz.i + 1) + " of " + quiz.pool.length + (spoken ? "" : ": " + q.q) + (need > 1 ? " Name " + needWord + "." : ""));
+}
+
+function gradeAnswer(text) {
+  if (quiz.answered) return;
+  quiz.answered = true;
+  const q = quiz.pool[quiz.i];
+  const need = q.need || 1;
+  const matchedSet = text !== null ? matchedIndices(text, q) : new Set();
+  const matched = matchedSet.size;
+  const ok = matched >= need;
+  const partial = need > 1 && matched > 0 && matched < need;
+  quiz.results.push({ q, correct: ok });
+  recordResult(q.id, ok);
+  const rf = studyAction();
+  if (ok) playChime("correct");
+  const answerPanel = document.getElementById("quiz-answer");
+  answerPanel.hidden = false;
+  // On a partial answer, mark which accepted answers she already gave.
+  if (partial) answerPanel.innerHTML = quizRevealHTML(q, matchedSet);
+  document.getElementById("quiz-q").hidden = false;
+  document.getElementById("quiz-input").disabled = true;
+  const verdict = document.getElementById("quiz-verdict");
+  const badText = text === null ? "The accepted answers are above."
+    : partial ? "Almost &mdash; you gave " + matched + " of " + need + ". You need " + need + " for the officer to count it. The accepted answers are above."
+    : "Not quite &mdash; the accepted answers are above.";
+  verdict.innerHTML =
+    (ok ? '<p class="verdict-good pulse">Correct! ✓</p>'
+        : '<p class="verdict-bad shake">' + badText + "</p>" +
+          (text !== null ? '<p class="typed-echo">You typed: &ldquo;' + esc(text) + '&rdquo;</p>' : "")) +
+    '<div class="row"><button type="button" class="btn" id="quiz-next">' +
+      (quiz.results.length < quiz.pool.length ? "Next question" : "See the score") + "</button>" +
+    (!ok && text !== null ? '<button type="button" class="btn-quiet" id="quiz-override">My answer was actually right</button>' : "") +
+    "</div>" +
+    '<div class="tutor-slot" id="quiz-tutor"></div>';
+  attachTutorButton(document.getElementById("quiz-tutor"), { q: q.q, a: q.a, note: q.note || "" });
+  document.getElementById("quiz-next").addEventListener("click", advanceQuiz);
+  const over = document.getElementById("quiz-override");
+  if (over) over.addEventListener("click", () => {
+    // Self-declared: counts for THIS round's score so she's never stuck, but does NOT
+    // move tested mastery/readiness (only the checker or the tutor's grade does).
+    quiz.results[quiz.results.length - 1].correct = true;
+    verdict.querySelector(".verdict-bad").outerHTML = '<p class="verdict-good">Counted for this round. ✓</p>';
+    over.remove();
+    document.getElementById("quiz-next").focus();
+  });
+  document.getElementById("quiz-next").focus();
+  announce((ok ? "Correct." : (partial ? "You gave " + matched + " of " + need + ". You need " + need + ". " : "Not correct. ") + "Accepted answers: " + q.a.join("; ")) + studyRewardMsg(rf));
+  // Upgrade-only LLM second opinion: only when the algorithm said wrong AND she
+  // actually typed something. It can confirm an answer the matcher missed (typos,
+  // paraphrases), never overturn a correct one, and silently gives up if the tutor
+  // is offline or slow.
+  if (!ok && text !== null && tutorEnabled) {
+    requestSecondOpinion(q, need, text, verdict, quiz.results[quiz.results.length - 1]);
+  }
+}
+
+function requestSecondOpinion(q, need, text, verdictEl, resultEntry) {
+  const badEl = verdictEl.querySelector(".verdict-bad");
+  if (!badEl) return;
+  const token = quiz.i;
+  verdictEl.setAttribute("aria-busy", "true");
+  const pending = document.createElement("p");
+  pending.className = "recheck";
+  pending.innerHTML = '<span class="spinner" aria-hidden="true"></span> Double-checking your answer&hellip;';
+  badEl.insertAdjacentElement("afterend", pending);
+  const controller = new AbortController();
+  quiz.gradeCheck = controller;
+  const timer = setTimeout(() => controller.abort(), 25000);
+  const stop = () => {
+    clearTimeout(timer);
+    if (quiz.gradeCheck === controller) quiz.gradeCheck = null;
+    // Race guards: she may have advanced, or the verdict may have been replaced/flipped.
+    if (token !== quiz.i || !document.body.contains(verdictEl)) return false;
+    pending.remove();
+    verdictEl.setAttribute("aria-busy", "false");
+    return true;
+  };
+  fetch("/grade", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ q: q.q, a: q.a, note: q.note || "", need, typed: text }),
+    signal: controller.signal
+  }).then(r => r.json()).then(d => {
+    if (!stop()) return;
+    const stillBad = verdictEl.querySelector(".verdict-bad");
+    if (d && d.acceptable && stillBad) {
+      resultEntry.correct = true;
+      overrideToCorrect(q.id);
+      stillBad.outerHTML = '<p class="verdict-good">The tutor accepted your answer &mdash; it counts. ✓</p>';
+      const over = document.getElementById("quiz-override");
+      if (over) {
+        if (document.activeElement === over) document.getElementById("quiz-next").focus();
+        over.remove();
+      }
+      announce("Good news — the tutor accepted your answer. It counts as correct.");
+    }
+  }).catch(() => { stop(); });
+}
+
+function advanceQuiz() {
+  if (quiz.gradeCheck) { quiz.gradeCheck.abort(); quiz.gradeCheck = null; }
+  const correct = quiz.results.filter(r => r.correct).length;
+  const wrong = quiz.results.length - correct;
+  const remaining = quiz.pool.length - quiz.results.length;
+  if (quiz.mode === "interview" && !quiz.stopOffered && remaining > 0 && (correct >= 6 || wrong >= 5)) {
+    quiz.stopOffered = true;
+    quizBody.innerHTML =
+      '<h3 tabindex="-1" id="early-heading">' + (correct >= 6 ? "That&rsquo;s a pass! 🎉" : "The officer would stop here") + "</h3>" +
+      "<p>" + (correct >= 6
+        ? "You reached 6 correct with " + remaining + " question" + (remaining === 1 ? "" : "s") + " to spare. On the real test, the officer stops asking once you pass."
+        : "Five wrong means this round can&rsquo;t reach 6. On the real test the officer would stop here &mdash; in practice, keep going.") + "</p>" +
+      '<div class="row"><button type="button" class="btn" id="early-finish">Finish</button>' +
+      '<button type="button" class="btn-quiet" id="early-continue">Keep practicing</button></div>';
+    document.getElementById("early-finish").addEventListener("click", renderScore);
+    document.getElementById("early-continue").addEventListener("click", () => { quiz.i++; renderQuizQuestion(); });
+    document.getElementById("early-heading").focus();
+    return;
+  }
+  quiz.i++;
+  if (quiz.i < quiz.pool.length) renderQuizQuestion(); else renderScore();
+}
+
+function renderScore() {
+  const total = quiz.results.length;
+  const score = quiz.results.filter(r => r.correct).length;
+  const missed = quiz.results.filter(r => !r.correct);
+  const scored = quiz.mode !== "weak";
+  const passed = score >= 6;
+  const prevBest = loadBest();
+  const isBest = scored && score > prevBest;
+  if (isBest) saveBest(score);
+  let html = '<h3 tabindex="-1" id="score-heading">' + (scored ? "Quiz complete" : "Weak-spot practice done") + "</h3>";
+  if (scored) {
+    html += '<p class="pass-line ' + (passed ? "pass" : "fail") + '">' +
+      (passed ? "You passed — " + score + " out of " + total + " correct."
+              : "Not this time — " + score + " out of " + total + " correct. You need 6 to pass.") + "</p>" +
+      '<p class="best-line">' + (isBest
+        ? '<span aria-hidden="true">🌟</span> New personal best — ' + score + " of " + total + "!"
+        : "Your best so far: " + Math.max(prevBest, score) + " of " + total + ".") + "</p>" +
+      '<p class="love-note">' + pickNote(passed ? PASS_NOTES : MISS_NOTES) + "</p>";
+  } else {
+    html += '<p class="pass-line">' + score + " of " + total + " right this round.</p>" +
+      (missed.length ? "" : '<p class="love-note">Weak spots? What weak spots. ❤️</p>');
+  }
+  if (missed.length) {
+    html += "<h4>Questions to study again</h4><ul class='missed'>" +
+      missed.map(r =>
+        "<li><p><strong>" + esc(r.q.q) + "</strong></p>" +
+        '<p class="correct-label">Correct answer' + (r.q.a.length > 1 ? "s (any one is accepted)" : "") + ":</p>" +
+        answersHTML(r.q) + "</li>"
+      ).join("") + "</ul>";
+  }
+  html += '<div class="row"><button type="button" class="btn" id="quiz-again">Back to quiz menu</button></div>';
+  quizBody.innerHTML = html;
+  if (scored && passed) { confettiBurst(); playChime("milestone"); }
+  if (scored && passed && !milesDone.has("first-pass")) {
+    milesDone.add("first-pass"); saveMiles();
+    showMilestone({ key: "first-pass", title: "Your first passing score! 🎓",
+      body: "Six or more &mdash; that&rsquo;s a pass on test day, my love. ❤️" });
+  }
+  document.getElementById("quiz-again").addEventListener("click", quizIntro);
+  document.getElementById("score-heading").focus();
+  if (scored) announce((passed ? "You passed! " : "") + score + " out of " + total + " correct." +
+    (isBest ? " New personal best." : ""));
+}
+
+function confettiBurst() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const wrap = document.createElement("div");
+  wrap.className = "confetti";
+  wrap.setAttribute("aria-hidden", "true");
+  const colors = ["#B03060", "#1e4b79", "#c9962a", "#e8748f"];
+  for (let i = 0; i < 28; i++) {
+    const p = document.createElement("span");
+    if (i % 4 === 0) { p.textContent = "❤"; p.className = "confetti-heart"; p.style.color = colors[0]; }
+    else p.style.background = colors[i % colors.length];
+    p.style.left = (Math.random() * 100) + "%";
+    p.style.animationDelay = (Math.random() * 0.8) + "s";
+    p.style.animationDuration = (2.2 + Math.random() * 1.6) + "s";
+    wrap.appendChild(p);
+  }
+  document.body.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 5000);
+}
+
+// ---------- tutor (chat with the local LLM via server.js) ----------
+
+let tutorEnabled = false;
+const generalChatHistory = [];
+
+function tutorInit() {
+  fetch("/chat-status").then(r => r.json()).then(d => {
+    // The spoken mock interview needs the study server + a reachable whisper backend.
+    if (d.stt) {
+      sttEnabled = true;
+      document.getElementById("home-card-conversation").hidden = false;
+    }
+    if (!d.enabled) return;
+    tutorEnabled = true;
+    // The standalone Tutor chat screen is hidden from Home; the per-question
+    // "Ask the tutor" buttons (flashcards, quiz, browse) still work below.
+    chatWidget(document.getElementById("tutor-chat"), null, generalChatHistory);
+    renderCard(); // adds the tutor button to the current flashcard
+    document.querySelectorAll(".ask-toggle").forEach(b => { b.hidden = false; }); // reveal Browse per-question tutor
+  }).catch(() => { /* no server (e.g. file opened directly) — tutor stays hidden */ });
+}
+
+function attachTutorButton(host, context) {
+  if (!tutorEnabled) { host.innerHTML = ""; return; }
+  host.innerHTML = '<button type="button" class="btn-quiet">💬 Ask the tutor</button>';
+  host.querySelector("button").addEventListener("click", () => chatWidget(host, context, []));
+}
+
+// Wrap runs of Bengali script (block U+0980–U+09FF, plus the danda U+0964–U+0965)
+// in <span lang="bn"> so assistive tech reads them with a Bengali voice; English
+// runs are left bare to inherit the page's lang="en". Escapes every run.
+function bengaliHTML(text) {
+  return String(text).split(/([ঀ-৿।॥]+)/).map((run, i) =>
+    !run ? "" : (i % 2 ? '<span lang="bn">' + esc(run) + "</span>" : esc(run))
+  ).join("");
+}
+function chatWidget(host, context, history) {
+  host.innerHTML =
+    '<div class="chat-log"></div>' +
+    '<form class="chat-form">' +
+    '<input type="text" aria-label="Message to the tutor" placeholder="Ask the tutor&hellip;" autocomplete="off">' +
+    '<button type="submit" class="btn">Send</button></form>' +
+    '<p class="drill-note">The tutor is an AI on our home computer &mdash; it can make mistakes. The official answers on the cards are always right.</p>';
+  const log = host.querySelector(".chat-log");
+  const form = host.querySelector("form");
+  const input = host.querySelector("input");
+  function bubble(role, text) {
+    const div = document.createElement("div");
+    div.className = "chat-msg chat-" + role;
+    // Tutor replies are English then a Bengali translation; wrap the Bengali runs
+    // in lang="bn" so screen readers switch voice (WCAG 3.1.2). User messages stay
+    // plain text.
+    if (role === "assistant") div.innerHTML = bengaliHTML(text);
+    else div.textContent = text;
+    log.appendChild(div);
+    return div;
+  }
+  history.forEach(m => bubble(m.role, m.content));
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = "";
+    history.push({ role: "user", content: text });
+    bubble("user", text);
+    const wait = bubble("assistant", "Thinking…");
+    try {
+      const r = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history, context })
+      });
+      const d = await r.json();
+      const reply = d.reply || d.error || "No answer came back — please try again.";
+      if (d.reply) { wait.innerHTML = bengaliHTML(reply); history.push({ role: "assistant", content: d.reply }); }
+      else wait.textContent = reply;
+      announce("Tutor replied.");
+    } catch (err) {
+      wait.textContent = "The tutor isn't reachable right now. It runs on our home computer — make sure Tailscale is on.";
+    }
+    input.focus();
+  });
+  input.focus();
+}
+
+// ---------- reading & writing practice ----------
+// Practice sentences are written for this app using ONLY words from the
+// official USCIS reading/writing vocabulary lists (validated in CI-style
+// check before shipping; see SOURCES.md).
+
+const READING_SENTENCES = [
+  "Who was the first President?",
+  "What is the capital of the United States?",
+  "Who lives in the White House?",
+  "Where is the White House?",
+  "When is Independence Day?",
+  "What are the colors of the American flag?",
+  "How many Senators do we have?",
+  "When do we vote for President?",
+  "Who elects Congress?",
+  "What do we pay to the government?",
+  "What country is north of the United States?",
+  "Why do people want to come to America?"
+];
+const WRITING_SENTENCES = [
+  "Washington was the first President.",
+  "Adams was the second President.",
+  "The White House is in Washington, D.C.",
+  "Independence Day is in July.",
+  "The flag is red, white, and blue.",
+  "Citizens can vote.",
+  "We pay taxes.",
+  "Congress meets in Washington, D.C.",
+  "The President lives in the White House.",
+  "Memorial Day is in May.",
+  "Thanksgiving is in November.",
+  "Alaska is the largest state.",
+  "Canada is north of the United States.",
+  "Mexico is south of the United States.",
+  "People want to be free.",
+  "Lincoln was the President during the Civil War.",
+  "Washington is the Father of Our Country.",
+  "Labor Day is in September.",
+  "We have fifty states.",
+  "Columbus Day is in October."
+];
+
+const reading = { i: 0 };
+function renderReading() {
+  const host = document.getElementById("reading-drill");
+  const s = READING_SENTENCES[reading.i];
+  host.innerHTML =
+    '<div class="card"><div class="card-pad"><span class="q-text">' + esc(s) + "</span></div></div>" +
+    '<div class="row"><button type="button" class="btn-quiet" id="read-hear">🔊 Hear it</button>' +
+    '<button type="button" class="btn" id="read-next">Next sentence</button></div>' +
+    '<p class="drill-note">Sentence ' + (reading.i + 1) + " of " + READING_SENTENCES.length + "</p>";
+  document.getElementById("read-hear").addEventListener("click", () => speak(s));
+  document.getElementById("read-next").addEventListener("click", () => {
+    reading.i = (reading.i + 1) % READING_SENTENCES.length;
+    renderReading();
+  });
+}
+
+const writing = { i: 0 };
+function normalizeSentence(text) {
+  return text.toLowerCase().replace(/[.,’']/g, "").replace(/\s+/g, " ").trim();
+}
+function renderWriting() {
+  const host = document.getElementById("writing-drill");
+  const s = WRITING_SENTENCES[writing.i];
+  host.innerHTML =
+    '<div class="row"><button type="button" class="btn" id="write-play">🔊 Play the sentence</button>' +
+    '<button type="button" class="btn-quiet" id="write-show">Show it instead</button></div>' +
+    '<div id="write-shown" hidden class="card"><div class="card-pad"><span class="q-text">' + esc(s) + "</span></div></div>" +
+    '<form id="write-form">' +
+    '<label class="drill-label" for="write-input">Write what you heard</label>' +
+    '<input type="text" id="write-input" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+    '<div class="row"><button type="submit" class="btn">Check</button></div></form>' +
+    '<div id="write-verdict"></div>' +
+    '<p class="drill-note">Sentence ' + (writing.i + 1) + " of " + WRITING_SENTENCES.length + "</p>";
+  document.getElementById("write-play").addEventListener("click", () => {
+    if (!speak(s)) document.getElementById("write-shown").hidden = false;
+  });
+  document.getElementById("write-show").addEventListener("click", () => {
+    document.getElementById("write-shown").hidden = false;
+  });
+  document.getElementById("write-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const typed = document.getElementById("write-input").value;
+    const ok = normalizeSentence(typed) === normalizeSentence(s);
+    const rf = studyAction();
+    if (ok) playChime("correct");
+    document.getElementById("write-shown").hidden = false;
+    document.getElementById("write-verdict").innerHTML =
+      (ok ? '<p class="verdict-good pulse">Perfect! ✓</p>'
+          : '<p class="verdict-bad shake">Not quite &mdash; the sentence is shown above.</p>' +
+            '<p class="typed-echo">You wrote: &ldquo;' + esc(typed) + '&rdquo;</p>') +
+      '<div class="row"><button type="button" class="btn" id="write-next">Next sentence</button></div>';
+    announce((ok ? "Perfect." : "Not quite — the sentence is shown above.") + studyRewardMsg(rf));
+    document.getElementById("write-next").addEventListener("click", () => {
+      writing.i = (writing.i + 1) % WRITING_SENTENCES.length;
+      renderWriting();
+    });
+  });
+}
+
+// ---------- mock interview (spoken ceremony) ----------
+// A hands-free spoken interview on the same civics questions, grader, and reading/
+// writing drills. Phases: greeting/oath → civics Q&A → reading → writing → closing.
+// She speaks; whisper transcribes; the existing trust core (matchedIndices) grades,
+// with the LLM /grade second opinion rescuing transcription near-misses. Enabled
+// only when the study server + whisper are reachable (sttEnabled, set in tutorInit).
+
+let sttEnabled = false;
+const convoBody = document.getElementById("convo-body");
+const convo = { feedback: "coaching", phase: "intro", pool: null, i: 0, results: [],
+  readIndex: 0, writeIndex: 0, reading: null, writing: null, typeMode: false };
+
+const OFFICER = {
+  greeting: "Good morning. I am your officer for today's naturalization interview. Please raise your right hand. Do you promise to tell the truth today?",
+  toCivics: "Thank you. Now I will ask you some civics questions. Please answer each one out loud.",
+  correct: ["Correct.", "That's right.", "Good.", "Yes, that's correct."],
+  neutral: ["Okay.", "Thank you.", "Alright.", "Mm-hm."],
+  toReading: "Good. Now the reading test. Please read this sentence out loud.",
+  againReading: "Please read this sentence out loud.",
+  toWriting: "Now the writing test. I will say a sentence. Please type it.",
+};
+
+const CONVO_STATUS = {
+  listening: "🎙️ Listening… answer out loud, then pause when you're done.",
+  transcribing: "Writing down what you said…",
+  checking: "Checking your answer…",
+  "no-speech": "I didn't hear anything. Tap the mic to try again, or type your answer.",
+  "mic-denied": "The microphone is off — you can type your answers instead.",
+  trouble: "I couldn't catch that. Tap the mic to try again, or type your answer.",
+  "": "",
+};
+
+function focusConvo() { const s = convoBody.querySelector("#convo-stage"); if (s) s.focus(); }
+
+// Officer's on-screen card (captions — every spoken line is also visible) plus an
+// empty #convo-turn slot the per-phase controls render into.
+function convoStage(officerLine, subjectHTML, progress) {
+  return (progress ? '<p class="progress">' + esc(progress) + "</p>" : "") +
+    '<div class="card convo-stage" id="convo-stage" tabindex="-1"><div class="card-pad">' +
+      '<p class="convo-officer"><span class="convo-who">Officer</span>' + esc(officerLine) + "</p>" +
+      (subjectHTML || "") +
+    "</div></div>" +
+    '<div id="convo-turn"></div>';
+}
+
+// One spoken exchange: speaks `line`, auto-opens the mic when the officer finishes,
+// transcribes, and hands the text to onText. Mic button doubles as tap-to-stop; a
+// "Type instead" path always exists (and takes over on any mic trouble).
+function convoTurn(host, line, onText, opts) {
+  opts = opts || {};
+  host.innerHTML =
+    '<div class="row">' +
+      '<button type="button" class="btn" id="convo-mic" aria-pressed="false">🎤 Start speaking</button>' +
+      '<button type="button" class="btn-quiet" id="convo-repeat">🔊 Repeat</button>' +
+      '<button type="button" class="btn-quiet" id="convo-type">⌨️ Type instead</button>' +
+    "</div>" +
+    '<p class="convo-status" id="convo-status"></p>' +
+    '<div id="convo-type-area"></div>';
+  const statusEl = host.querySelector("#convo-status");
+  const micBtn = host.querySelector("#convo-mic");
+  const setStatus = key => { statusEl.textContent = CONVO_STATUS[key] || ""; };
+
+  const resetMic = () => { micBtn.setAttribute("aria-pressed", "false"); micBtn.textContent = "🎤 Start speaking"; };
+  const beginListen = () => {
+    setStatus("listening");
+    announce("Listening.");
+    micBtn.setAttribute("aria-pressed", "true");
+    micBtn.textContent = "● Listening — tap to stop";
+    startRecording("auto", wav => {
+      resetMic();
+      setStatus("transcribing");
+      transcribe(wav)
+        .then(text => { setStatus(""); onText((text || "").trim()); })
+        .catch(() => setStatus("trouble"));
+    }, err => {
+      resetMic();
+      if (err === "mic-denied") { convo.typeMode = true; setStatus("mic-denied"); showType(); }
+      else setStatus(err === "no-speech" ? "no-speech" : "trouble");
+    });
+  };
+  const showType = () => {
+    const area = host.querySelector("#convo-type-area");
+    if (area.querySelector("form")) { area.querySelector("input").focus(); return; }
+    area.innerHTML =
+      '<form class="convo-type"><label class="quiz-label" for="convo-type-input">' + esc(opts.typeLabel || "Type your answer") + "</label>" +
+      '<input type="text" id="convo-type-input" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+      '<div class="row"><button type="submit" class="btn">Answer</button></div></form>';
+    area.querySelector("form").addEventListener("submit", e => {
+      e.preventDefault();
+      const v = area.querySelector("input").value.trim();
+      if (v) onText(v);
+    });
+    area.querySelector("input").focus();
+  };
+
+  micBtn.addEventListener("click", () => { if (micState.active) stopRecording(); else beginListen(); });
+  host.querySelector("#convo-repeat").addEventListener("click", () => speak(line));
+  host.querySelector("#convo-type").addEventListener("click", showType);
+
+  if (convo.typeMode || !micSupported()) { speak(line); showType(); }
+  // Open the mic a beat after the officer stops. Guard the deferred call: if she taps
+  // "Type instead" or the mic during the lead-in, don't open (and re-announce) on top.
+  else speak(line, () => setTimeout(() => {
+    if (!convo.typeMode && !micState.active) beginListen();
+  }, MIC_LEAD_IN_MS));
+}
+
+// Civics phase ends at the officer's real early-stop (6 right / 5 wrong) or when the
+// 10-question pool is exhausted. Returns "pass" | "fail" | null.
+function earlyStopReason(results) {
+  const correct = results.filter(r => r.correct).length;
+  const wrong = results.length - correct;
+  if (correct >= 6) return "pass";
+  if (wrong >= 5) return "fail";
+  return null;
+}
+function convoCivicsDone() {
+  return !!earlyStopReason(convo.results) || convo.results.length >= convo.pool.length;
+}
+
+// Same upgrade-only LLM second opinion the typed quiz uses, promise-shaped for the
+// spoken flow. Resolves "yes" (tutor accepts an answer the matcher missed), "no", or
+// "unreachable". "unreachable" (grader 502 / network / timeout) is kept distinct from
+// a real "no" so the caller can let her self-mark instead of silently scoring a
+// correct answer wrong when the LLM is simply down.
+function convoSecondOpinion(q, need, text) {
+  return fetch("/grade", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ q: q.q, a: q.a, note: q.note || "", need, typed: text }),
+    signal: AbortSignal.timeout(25000),
+  }).then(r => (r.ok ? r.json() : Promise.reject(new Error("grade " + r.status))))
+    .then(d => (d && d.acceptable) ? "yes" : "no")
+    .catch(() => "unreachable");
+}
+
+function convoIntro() {
+  convo.phase = "intro";
+  const micNote = micSupported()
+    ? "Find a quiet room. When the officer finishes speaking, the microphone opens on its own — just answer out loud. You can also tap the mic or type."
+    : "This device has no microphone available, so you'll type your answers. The officer still reads everything out loud.";
+  convoBody.innerHTML =
+    "<p>A full practice interview, out loud — a greeting, the civics questions, then the reading and writing tests. Answer the officer just like the real day.</p>" +
+    '<fieldset class="convo-modes"><legend>How should the officer respond?</legend>' +
+      '<label class="convo-mode"><input type="radio" name="convo-feedback" value="coaching" checked> ' +
+        "<span><strong>Coaching</strong> — she tells you the answer after each question, so you learn as you go.</span></label>" +
+      '<label class="convo-mode"><input type="radio" name="convo-feedback" value="realistic"> ' +
+        "<span><strong>Realistic</strong> — she stays quiet like the real officer, and you see your score only at the end.</span></label>" +
+    "</fieldset>" +
+    '<p class="drill-note">' + esc(micNote) + "</p>" +
+    '<div class="row"><button type="button" class="btn" id="convo-begin">Begin interview</button></div>';
+  convoBody.querySelector("#convo-begin").addEventListener("click", () => {
+    const sel = convoBody.querySelector('input[name="convo-feedback"]:checked');
+    convo.feedback = sel ? sel.value : "coaching";
+    convoStart();
+  });
+}
+
+function convoStart() {
+  convo.pool = shuffle(QUESTIONS).slice(0, 10);
+  convo.i = 0; convo.results = [];
+  convo.readIndex = Math.floor(Math.random() * READING_SENTENCES.length);
+  convo.writeIndex = Math.floor(Math.random() * WRITING_SENTENCES.length);
+  convo.reading = null; convo.writing = null;
+  convo.typeMode = !micSupported();
+  convoGreeting();
+}
+
+function convoGreeting() {
+  convo.phase = "greeting";
+  const line = OFFICER.greeting;
+  convoBody.innerHTML = convoStage(line, '<p class="convo-hint">Raise your right hand and say &ldquo;I do.&rdquo;</p>');
+  focusConvo();
+  convoTurn(convoBody.querySelector("#convo-turn"), line, () => convoCivics(), { typeLabel: "Type &ldquo;I do&rdquo;" });
+}
+
+function convoCivics() {
+  convo.phase = "civics";
+  const q = convo.pool[convo.i];
+  const need = q.need || 1;
+  const line = (convo.i === 0 ? OFFICER.toCivics + " " : "") + q.q;
+  convoBody.innerHTML = convoStage(line,
+    '<p class="convo-subject q-text">' + esc(q.q) + "</p>" +
+    (need > 1 ? '<p class="quiz-need">Name ' + (need === 3 ? "three" : "two") + ".</p>" : ""),
+    "Civics question " + (convo.i + 1) + " of " + convo.pool.length);
+  focusConvo();
+  convoTurn(convoBody.querySelector("#convo-turn"), line, text => convoGradeCivics(q, text), { typeLabel: "Type your answer" });
+}
+
+function convoGradeCivics(q, text) {
+  const need = q.need || 1;
+  const deterministicOk = matchedIndices(text, q).size >= need;
+  const finalize = accepted => {
+    recordResult(q.id, accepted);
+    studyAction();
+    convo.results.push({ q, correct: accepted });
+    if (accepted) playChime("correct");
+    convoCivicsFeedback(q, text, accepted);
+  };
+  if (!deterministicOk && text && sttEnabled) {
+    const statusEl = convoBody.querySelector("#convo-status");
+    if (statusEl) statusEl.textContent = CONVO_STATUS.checking;
+    convoSecondOpinion(q, need, text).then(verdict => {
+      // Grader down: don't silently score a possibly-correct answer wrong — let her mark it.
+      if (verdict === "unreachable") convoSelfMark(q, text, finalize);
+      else finalize(verdict === "yes");
+    });
+  } else {
+    finalize(deterministicOk);
+  }
+}
+
+// Grader was unreachable (LLM down) and the fast matcher didn't accept it. Rather than
+// silently mark it wrong, tell her we couldn't check and let her self-mark — "I missed
+// it" flows into the normal coaching feedback (correct answer + Bengali). Both buttons
+// carry equal visual weight so the UI doesn't nudge her toward claiming correct.
+function convoSelfMark(q, text, finalize) {
+  const turn = convoBody.querySelector("#convo-turn");
+  const line = "I couldn't double-check that one right now. Did you get it right?";
+  const echo = text ? '<p class="typed-echo">You said: &ldquo;' + esc(text) + "&rdquo;</p>" : '<p class="typed-echo">No answer.</p>';
+  turn.innerHTML = echo +
+    "<p>Couldn&rsquo;t check that answer &mdash; the tutor isn&rsquo;t reachable. Mark it yourself, or ask Tawsif.</p>" +
+    '<p class="convo-caption">' + esc(line) + "</p>" +
+    '<div class="row">' +
+      '<button type="button" class="btn" id="convo-self-right">I got it right</button>' +
+      '<button type="button" class="btn" id="convo-self-wrong">I missed it</button>' +
+    "</div>";
+  speak(line);
+  announce("Couldn't check that answer. Mark it yourself: did you get it right, or did you miss it?");
+  let picked = false;
+  const pick = ok => { if (picked) return; picked = true; finalize(ok); };
+  turn.querySelector("#convo-self-right").addEventListener("click", () => pick(true));
+  turn.querySelector("#convo-self-wrong").addEventListener("click", () => pick(false));
+  turn.querySelector("#convo-self-right").focus();
+}
+
+// On-screen Bengali help for a missed coaching answer: the accepted answers in
+// Bengali, with the same AI-translation disclaimer as the flashcards. lang="bn" so a
+// screen reader switches voice (the English translation note is marked lang="en").
+// Empty when the question has no authored Bengali. Reuses the .bn-panel styling.
+function bnAnswerHelp(q) {
+  if (!q.abn || !q.abn.length) return "";
+  const items = "<ul>" + q.abn.map(a => "<li>" + esc(a) + "</li>").join("") + "</ul>";
+  const note = q.bnNote ? '<p class="bn-note" lang="en">Translation note: ' + esc(q.bnNote) + "</p>" : "";
+  return '<div class="bn-panel" lang="bn">' +
+      '<p class="bn-disclaimer">এই অনুবাদ AI দিয়ে করা — হুবহু সঠিক নাও হতে পারে। উপরের মূল ইংরেজি উত্তরই চূড়ান্ত।</p>' +
+      '<p class="bn-q">সঠিক উত্তর:</p>' + items + note + "</div>";
+}
+
+function convoCivicsFeedback(q, text, ok) {
+  const turn = convoBody.querySelector("#convo-turn");
+  const coaching = convo.feedback === "coaching";
+  const echo = text ? '<p class="typed-echo">You said: &ldquo;' + esc(text) + "&rdquo;</p>" : '<p class="typed-echo">No answer.</p>';
+  // On a missed coaching answer, follow the English up with the correct answer in
+  // Bengali — spoken (if the device has a Bengali voice) and always shown on screen.
+  const bnHelp = (coaching && !ok) ? bnAnswerHelp(q) : "";
+  const bnSpoken = bnHelp && q.abn && q.abn.length ? "সঠিক উত্তর — " + q.abn[0] : "";
+  let officerLine, html;
+  if (coaching) {
+    officerLine = ok ? pickNote(OFFICER.correct) : "The answer is: " + q.a[0] + ".";
+    html = (ok ? '<p class="verdict-good pulse">Correct ✓</p>'
+               : '<p class="verdict-bad">Not quite. The accepted answer' + (q.a.length > 1 ? "s" : "") + ":</p>" + answersHTML(q) + bnHelp) + echo;
+  } else {
+    officerLine = pickNote(OFFICER.neutral);
+    html = echo;
+  }
+  const last = convoCivicsDone();
+  turn.innerHTML = html +
+    '<p class="convo-caption">' + esc(officerLine) + "</p>" +
+    '<div class="row"><button type="button" class="btn" id="convo-next">' + (last ? "Continue to reading" : "Next question") + "</button></div>";
+  // Speak English, then follow with Bengali (skipped automatically if no bn voice).
+  speak(officerLine, bnSpoken ? () => speakBengali(bnSpoken) : null);
+  announce(coaching
+    ? (ok ? "Correct." : "Not correct. Accepted answers: " + q.a.join("; ") + "." + (bnHelp ? " Bengali translation shown below." : ""))
+    : "Answer recorded.");
+  const nb = turn.querySelector("#convo-next");
+  nb.addEventListener("click", () => { if (convoCivicsDone()) convoReading(); else { convo.i++; convoCivics(); } });
+  nb.focus();
+}
+
+function readingMatch(said, target) {
+  const norm = t => (t || "").toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim().split(" ").filter(Boolean);
+  const want = norm(target);
+  if (!want.length) return false;
+  const got = new Set(norm(said));
+  let hit = 0;
+  for (const w of want) if (got.has(w)) hit++;
+  return hit / want.length >= 0.6;
+}
+
+function convoReading() {
+  convo.phase = "reading";
+  const s = READING_SENTENCES[convo.readIndex];
+  const line = convo.reading === null ? OFFICER.toReading : OFFICER.againReading;
+  convoBody.innerHTML = convoStage(line, '<p class="convo-subject q-text">' + esc(s) + "</p>", "Reading test");
+  focusConvo();
+  convoTurn(convoBody.querySelector("#convo-turn"), line, text => convoGradeReading(s, text), { typeLabel: "Type the sentence" });
+}
+
+function convoGradeReading(s, text) {
+  const ok = readingMatch(text, s);
+  convo.reading = ok;
+  studyAction();
+  if (ok) playChime("correct");
+  const turn = convoBody.querySelector("#convo-turn");
+  const coaching = convo.feedback === "coaching";
+  const officerLine = coaching ? (ok ? "Good reading." : "That's alright — the sentence is on the screen.") : pickNote(OFFICER.neutral);
+  turn.innerHTML =
+    (coaching ? (ok ? '<p class="verdict-good pulse">Read correctly ✓</p>' : '<p class="verdict-bad">Not quite — read it again from the screen anytime.</p>') : "") +
+    (text ? '<p class="typed-echo">You read: &ldquo;' + esc(text) + "&rdquo;</p>" : "") +
+    '<p class="convo-caption">' + esc(officerLine) + "</p>" +
+    '<div class="row"><button type="button" class="btn" id="convo-next">Continue to writing</button></div>';
+  speak(officerLine);
+  announce(coaching ? (ok ? "Read correctly." : "Not quite.") : "Answer recorded.");
+  const nb = turn.querySelector("#convo-next");
+  nb.addEventListener("click", convoWriting);
+  nb.focus();
+}
+
+function convoWriting() {
+  convo.phase = "writing";
+  const s = WRITING_SENTENCES[convo.writeIndex];
+  convoBody.innerHTML = convoStage(OFFICER.toWriting, "", "Writing test");
+  focusConvo();
+  const turn = convoBody.querySelector("#convo-turn");
+  turn.innerHTML =
+    '<div class="row"><button type="button" class="btn-quiet" id="convo-w-play">🔊 Hear it again</button>' +
+    '<button type="button" class="btn-quiet" id="convo-w-show">Show it</button></div>' +
+    '<div id="convo-w-shown" hidden class="card"><div class="card-pad"><span class="q-text">' + esc(s) + "</span></div></div>" +
+    '<form id="convo-w-form"><label class="quiz-label" for="convo-w-input">Type the sentence you heard</label>' +
+    '<input type="text" id="convo-w-input" autocomplete="off" autocapitalize="off" spellcheck="false">' +
+    '<div class="row"><button type="submit" class="btn">Submit</button></div></form>' +
+    '<div id="convo-w-verdict"></div>';
+  const shown = turn.querySelector("#convo-w-shown");
+  speak(OFFICER.toWriting + " " + s);
+  turn.querySelector("#convo-w-play").addEventListener("click", () => { if (!speak(s)) shown.hidden = false; });
+  turn.querySelector("#convo-w-show").addEventListener("click", () => { shown.hidden = false; });
+  turn.querySelector("#convo-w-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const typed = turn.querySelector("#convo-w-input").value;
+    const ok = normalizeSentence(typed) === normalizeSentence(s);
+    convo.writing = ok;
+    studyAction();
+    if (ok) playChime("correct");
+    shown.hidden = false;
+    const coaching = convo.feedback === "coaching";
+    const officerLine = coaching ? (ok ? "Well written." : "The sentence is shown above.") : "Thank you.";
+    turn.querySelector("#convo-w-verdict").innerHTML =
+      (coaching ? (ok ? '<p class="verdict-good pulse">Written correctly ✓</p>' : '<p class="verdict-bad">Not quite — the sentence is shown above.</p>') : "") +
+      (typed ? '<p class="typed-echo">You wrote: &ldquo;' + esc(typed) + "&rdquo;</p>" : "") +
+      '<p class="convo-caption">' + esc(officerLine) + "</p>" +
+      '<div class="row"><button type="button" class="btn" id="convo-w-next">See your result</button></div>';
+    speak(officerLine);
+    announce(coaching ? (ok ? "Written correctly." : "Not quite — the sentence is shown above.") : "Answer recorded.");
+    const nb = turn.querySelector("#convo-w-next");
+    nb.addEventListener("click", convoClosing);
+    nb.focus();
+  });
+  turn.querySelector("#convo-w-input").focus();
+}
+
+function convoClosing() {
+  convo.phase = "closing";
+  const asked = convo.results.length;
+  const civicsScore = convo.results.filter(r => r.correct).length;
+  const civicsPass = civicsScore >= 6;
+  const overallPass = civicsPass && convo.reading && convo.writing;
+  const officerLine = overallPass
+    ? "Congratulations. You passed every part of the interview today."
+    : "That is the end of the interview. Keep practicing — you are getting close.";
+  const missed = convo.results.filter(r => !r.correct);
+  let html =
+    '<p class="convo-caption">' + esc(officerLine) + "</p>" +
+    '<h3 tabindex="-1" id="convo-result-heading">Your mock interview</h3>' +
+    '<ul class="convo-scorecard">' +
+      "<li>Civics: <strong>" + civicsScore + " of " + asked + "</strong> correct — " + (civicsPass ? "pass ✓" : "need 6 to pass") + "</li>" +
+      "<li>Reading: <strong>" + (convo.reading ? "passed ✓" : "try again") + "</strong></li>" +
+      "<li>Writing: <strong>" + (convo.writing ? "passed ✓" : "try again") + "</strong></li>" +
+    "</ul>" +
+    '<p class="love-note">' + pickNote(overallPass ? PASS_NOTES : MISS_NOTES) + "</p>";
+  if (missed.length) {
+    html += "<h4>Civics questions to study again</h4><ul class='missed'>" +
+      missed.map(r =>
+        "<li><p><strong>" + esc(r.q.q) + "</strong></p>" +
+        '<p class="correct-label">Correct answer' + (r.q.a.length > 1 ? "s (any one is accepted)" : "") + ":</p>" +
+        answersHTML(r.q) + "</li>"
+      ).join("") + "</ul>";
+  }
+  html += '<div class="row"><button type="button" class="btn" id="convo-restart">Do another interview</button>' +
+    '<button type="button" class="btn-quiet" id="convo-home">Back to home</button></div>';
+  convoBody.innerHTML = html;
+  speak(officerLine);
+  if (overallPass) { confettiBurst(); playChime("milestone"); }
+  announce((overallPass ? "You passed! " : "") + "Civics " + civicsScore + " of " + asked +
+    ". Reading " + (convo.reading ? "passed" : "not passed") + ". Writing " + (convo.writing ? "passed" : "not passed") + ".");
+  convoBody.querySelector("#convo-restart").addEventListener("click", convoIntro);
+  convoBody.querySelector("#convo-home").addEventListener("click", () => switchMode("home"));
+  document.getElementById("convo-result-heading").focus();
+}
+
+// ---------- browse ----------
+
+// Collapsed Bengali translation of a question + its answers. The panel carries
+// lang="bn" so assistive tech reads it in Bengali; the disclaimer (Bengali, first)
+// and the optional English translation caveat (bnNote) set expectations.
+function bnPanelHTML(q, idScope) {
+  if (!q.qbn) return "";
+  // idScope keeps panel ids unique when the same question renders in two views at
+  // once (Browse renders all 100; a flashcard renders one) — else aria-controls
+  // would resolve to the wrong panel.
+  const id = "bn-" + (idScope ? idScope + "-" : "") + q.id;
+  const answers = "<ul>" + q.abn.map(a => "<li>" + esc(a) + "</li>").join("") + "</ul>";
+  const note = q.bnNote ? '<p class="bn-note" lang="en">Translation note: ' + esc(q.bnNote) + "</p>" : "";
+  return '<button type="button" class="bn-toggle" aria-expanded="false" aria-controls="' + id + '">' +
+      '<span lang="bn">বাংলা দেখুন</span> / Show in Bengali</button>' +
+    '<div class="bn-panel" id="' + id + '" lang="bn" hidden>' +
+      '<p class="bn-disclaimer">এই অনুবাদ AI দিয়ে করা — হুবহু সঠিক নাও হতে পারে। উপরের মূল ইংরেজি উত্তরই চূড়ান্ত।</p>' +
+      '<p class="bn-q">' + esc(q.qbn) + "</p>" +
+      answers + note +
+    "</div>";
+}
+
+// "Have I read this one?" set — the Browse reading quest. Reading a question's
+// Bengali panel counts too. Stored on this phone.
+const READ_KEY = "civics-read-v1";
+function loadRead() { try { return new Set(JSON.parse(localStorage.getItem(READ_KEY)) || []); } catch (e) { return new Set(); } }
+const readSet = loadRead();
+function saveRead() { try { localStorage.setItem(READ_KEY, JSON.stringify([...readSet])); } catch (e) {} }
+
+function updateReadBtn(btn, val) {
+  btn.setAttribute("aria-pressed", String(val));
+  btn.classList.toggle("is-read", val);
+  btn.querySelector(".read-icon").textContent = val ? "✓" : "○";
+  btn.querySelector(".read-label").textContent = val ? "Read" : "Mark as read";
+}
+function renderQuest() {
+  const el = document.getElementById("browse-quest");
+  if (!el) return;
+  const total = QUESTIONS.length;
+  const read = QUESTIONS.filter(q => readSet.has(q.id)).length;
+  const pct = total ? Math.round(read / total * 100) : 0;
+  el.innerHTML =
+    '<p class="quest-label"><span aria-hidden="true">📖</span> ' + read + " of " + total + " read</p>" +
+    '<span class="bar" aria-hidden="true"><span class="bar-fill" style="width:' + pct + '%"></span></span>';
+}
+function setRead(id, val) {
+  if (readSet.has(id) === val) return;
+  if (val) readSet.add(id); else readSet.delete(id);
+  saveRead();
+  if (val) announceReward(studyAction()); // reading a question counts as studying
+  const btn = document.querySelector('.read-toggle[data-id="' + id + '"]');
+  if (btn) updateReadBtn(btn, val);
+  renderQuest();
+  if (val && QUESTIONS.every(q => readSet.has(q.id)) && !milesDone.has("read-all")) {
+    milesDone.add("read-all"); saveMiles();
+    showMilestone({ key: "read-all", title: "You've read them all! 📚",
+      body: "Every question, start to finish. Look at you go, jaan. ❤️" });
+  }
+}
+
+function renderBrowse() {
+  const body = document.getElementById("browse-body");
+  let html = '<div class="quest" id="browse-quest"></div>';
+  for (const cat of ["Government", "History", "Civics"]) {
+    const qs = QUESTIONS.filter(q => q.category === cat);
+    html += "<h3>" + CATEGORY_NAMES[cat] + " (" + qs.length + " questions)</h3>";
+    // Numbered by the real question id (as text) so hidden dynamic questions don't
+    // shift the visible numbers — <ol> would auto-number by position and ignore gaps.
+    html += '<ul class="browse-list">' +
+      qs.map(q => {
+        const art = answerArt(q.id);
+        const emoji = art ? "" : ANSWER_EMOJI[q.id];
+        const mark = art ? " " + art : (emoji ? ' <span aria-hidden="true">' + emoji + "</span>" : "");
+        const read = readSet.has(q.id);
+        return '<li><p class="browse-q"><span class="qnum">Question ' + q.id + "</span> " + esc(q.q) +
+          mark + "</p>" +
+          answersHTML(q) + bnPanelHTML(q) +
+          '<button type="button" class="read-toggle" data-id="' + q.id + '" aria-pressed="' + read + '">' +
+            '<span class="read-icon" aria-hidden="true">' + (read ? "✓" : "○") + "</span> " +
+            '<span class="read-label">' + (read ? "Read" : "Mark as read") + "</span></button>" +
+          // Per-question tutor: a quiet disclosure, only shown once the tutor server
+          // is reachable (revealed by tutorInit). Panel id scoped to avoid colliding
+          // with bn-<id> / the fixed tutor hosts. Built lazily on first open.
+          '<button type="button" class="ask-toggle" data-id="' + q.id + '"' +
+            ' aria-expanded="false" aria-controls="chat-browse-' + q.id + '"' +
+            ' aria-label="Ask about this &mdash; question ' + q.id + '"' + (tutorEnabled ? "" : " hidden") + ">" +
+            '<span aria-hidden="true">💬</span> Ask about this</button>' +
+          '<div class="ask-panel" id="chat-browse-' + q.id + '" hidden></div>' +
+          "</li>";
+      }).join("") + "</ul>";
+  }
+  body.innerHTML = html;
+  renderQuest();
+}
+// One delegated listener handles Bengali toggles and read toggles (survives re-renders).
+document.addEventListener("click", e => {
+  const bn = e.target.closest(".bn-toggle");
+  if (bn) {
+    const panel = document.getElementById(bn.getAttribute("aria-controls"));
+    if (!panel) return;
+    const open = bn.getAttribute("aria-expanded") === "true";
+    bn.setAttribute("aria-expanded", String(!open));
+    panel.hidden = open;
+    // Opening a Browse question's Bengali (panel id "bn-<id>", no view scope) counts as reading it.
+    if (!open) { const m = /^bn-(\d+)$/.exec(bn.getAttribute("aria-controls")); if (m) setRead(+m[1], true); }
+    return;
+  }
+  const ask = e.target.closest(".ask-toggle");
+  if (ask) {
+    const panel = document.getElementById(ask.getAttribute("aria-controls"));
+    if (!panel) return;
+    const open = ask.getAttribute("aria-expanded") === "true";
+    ask.setAttribute("aria-expanded", String(!open));
+    if (open) {
+      // Collapsing: if focus is inside the panel (a click-collapse can leave the
+      // caret in the chat input), pull it back to the toggle so it doesn't fall to body.
+      if (panel.contains(document.activeElement)) ask.focus();
+      panel.hidden = true;
+    } else {
+      panel.hidden = false; // unhide BEFORE building so chatWidget's input.focus() lands
+      if (!panel.dataset.built) {
+        const q = ALL_QUESTIONS.find(x => x.id === +ask.dataset.id);
+        chatWidget(panel, { q: q.q, a: q.a, note: q.note || "" }, []);
+        panel.dataset.built = "1"; // build once; the conversation persists across collapse
+      } else {
+        panel.querySelector("input").focus();
+      }
+    }
+    return;
+  }
+  const rt = e.target.closest(".read-toggle");
+  if (rt) { const id = +rt.dataset.id; setRead(id, !readSet.has(id)); }
+});
+
+// ---------- one-time progress migration (old http origin → new https origin) ----------
+// localStorage is per-origin: when the phone's home-screen app moved from
+// http://…:8321 to https://… (the mic needs a secure context), the streak,
+// flashcard self-review, and mastery stayed stranded under the old origin. Both
+// URLs are the same server, so the old origin offers to send its civics-* keys
+// to /migrate and the new origin offers to restore them. The restore offer only
+// appears while this origin has no progress of its own, so it can never clobber.
+const MIGRATE_DISMISS_KEY = "civics-migrate-dismissed-v1";
+// Every persisted key is safe to carry over as-is (stats, self-review, milestones,
+// streak, daily goal, best score, read list, sound preference) — none of them
+// reference the old origin, so a straight copy is correct. Only the dismissal
+// flag itself is origin-local bookkeeping and must not travel.
+function migrateKeys() {
+  const out = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith("civics-") && k !== MIGRATE_DISMISS_KEY)
+      out[k] = localStorage.getItem(k);
+  }
+  return out;
+}
+// Real study progress only (excludes the sound toggle) — used to decide whether
+// there's anything worth sending, and whether the new origin already has its own
+// progress. A lone sound preference shouldn't trigger or block either offer.
+function hasProgress() {
+  return Object.keys(migrateKeys()).some(k => k !== SOUND_KEY);
+}
+const migrateSlot = document.getElementById("migrate-slot");
+function migrateCard(heading, bodyHTML) {
+  migrateSlot.innerHTML =
+    '<div class="card migrate-card"><div class="card-pad">' +
+    '<h3 tabindex="-1" id="migrate-h">' + heading + "</h3>" + bodyHTML +
+    "</div></div>";
+}
+
+// Old origin: offer to send this device's progress to the server.
+function offerMigrateSend() {
+  if (!hasProgress()) return;
+  const newUrl = "https://" + location.hostname + "/";
+  const newAppLink = '<a href="' + newUrl + '">the new app at ' + newUrl.replace("https://", "") + "</a>";
+  const sendLabel = "Send my progress to the new app";
+  migrateCard("Move your progress to the new app",
+    "<p>This is the old app address. Your streak, flashcards, and mastered questions are saved here, but " +
+    newAppLink + " can&rsquo;t see them. Send a copy over?</p>" +
+    '<div class="row"><button type="button" class="btn" id="migrate-send">' + sendLabel + "</button></div>" +
+    '<p class="migrate-status" id="migrate-status"></p>');
+  const btn = document.getElementById("migrate-send");
+  btn.addEventListener("click", () => {
+    if (btn.getAttribute("aria-disabled") === "true") return;
+    btn.setAttribute("aria-disabled", "true");
+    btn.textContent = "Sending…";
+    fetch("/migrate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(migrateKeys())
+    }).then(r => { if (!r.ok) throw new Error("http " + r.status); return r.json(); }).then(() => {
+      migrateCard("Move your progress to the new app",
+        "<p>Sent! Now open " + newAppLink + " and tap &ldquo;Restore my progress&rdquo; there.</p>");
+      document.getElementById("migrate-h").focus(); // the button is gone — don't drop focus to body
+      announce("Progress sent. Open the new app and tap Restore my progress.");
+    }).catch(err => {
+      btn.removeAttribute("aria-disabled");
+      btn.textContent = sendLabel;
+      // Distinguish "never reached the server" (Tailscale dropped, timeout) from a
+      // real server-side rejection, so a retry has an actual chance of working.
+      const msg = /^http /.test(err.message)
+        ? "The study server said no (" + err.message.slice(5) + "). Try again in a moment."
+        : "Couldn’t reach the study server &mdash; check you’re connected to the tailnet, then try again.";
+      document.getElementById("migrate-status").innerHTML = msg;
+      announce(msg.replace(/&mdash;/, "—"));
+    });
+  });
+}
+
+// New origin: if a sent copy is waiting and this device has no progress yet, offer to restore it.
+function offerMigrateRestore() {
+  if (localStorage.getItem(MIGRATE_DISMISS_KEY)) return;
+  if (hasProgress()) return; // this origin already has progress — never clobber it
+  fetch("/migrate").then(r => r.json()).then(d => {
+    const data = d && d.data;
+    if (!data || !Object.keys(data).length) return;
+    migrateCard("Your progress from the old app",
+      "<p>Found your saved progress from the old app address &mdash; streak, flashcards, and mastered questions. Bring it into this app?</p>" +
+      '<div class="row"><button type="button" class="btn" id="migrate-restore">Restore my progress</button>' +
+      '<button type="button" class="btn-quiet" id="migrate-later">Not now</button></div>');
+    announce("Saved progress from the old app was found. A restore option is on the home screen.");
+    document.getElementById("migrate-restore").addEventListener("click", () => {
+      for (const k in data) {
+        if (k.startsWith("civics-") && k !== MIGRATE_DISMISS_KEY) {
+          try { localStorage.setItem(k, String(data[k])); } catch (e) {}
+        }
+      }
+      location.reload(); // re-init every meter from the restored keys
+    });
+    document.getElementById("migrate-later").addEventListener("click", () => {
+      try { localStorage.setItem(MIGRATE_DISMISS_KEY, "1"); } catch (e) {}
+      migrateSlot.innerHTML = "";
+      document.getElementById("h-home").focus(); // the card is gone — don't drop focus to body
+    });
+  }).catch(() => {});
+}
+
+// http on the tailnet = the old :8321 address; https = the new one. localhost (dev) shows neither.
+if (location.protocol === "http:" && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") {
+  offerMigrateSend();
+} else if (location.protocol === "https:") {
+  offerMigrateRestore();
+}
+
+// ---------- init ----------
+
+renderCard();
+quizIntro();
+renderBrowse();
+renderHomeStats();
+renderReading();
+renderWriting();
+convoIntro();
+tutorInit();
+</script>
+</body>
+</html>
